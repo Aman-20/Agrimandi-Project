@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriMandi Connect</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7fafc;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            outline: none;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 2rem;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 0.75rem;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .clickable-tile {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .clickable-tile:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Carousel Styles */
+        .carousel-item {
+            display: none;
+            transition: opacity 0.7s ease-in-out;
+        }
+
+        .carousel-item.active {
+            display: block;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100">
+
+    <div id="app" class="flex flex-col min-h-screen">
+        <!--nav bar-->
+        <nav class="bg-white shadow-md py-4 sticky top-0 z-50">
+            <div class="container flex justify-between items-center flex-wrap">
+                <div class="text-2xl font-bold text-green-700">AgriMandi Connect</div>
+                <!-- NEW: Full Navigation Links -->
+                <div id="main-nav-links" class="flex items-center space-x-4 text-gray-600 font-medium">
+                </div>
+
+                <div class="flex items-center space-x-4">
+                    <div id="auth-links"></div>
+                    <select id="language-switcher" class="form-input w-auto text-sm py-1 px-2">
+                        <option value="en">English</option>
+                        <option value="hi">हिन्दी</option>
+                    </select>
+                </div>
+            </div>
+        </nav>
+
+        <main class="flex-grow">
+            <section id="page-home" class="page-content">
+                <!-- 1. Image Carousel -->
+                <div id="image-carousel" class="relative w-full h-96 overflow-hidden shadow-lg">
+                    <div class="carousel-item active">
+                        <img src="https://res.cloudinary.com/dp55vvd7j/image/upload/v1741255925/cld-sample-2.jpg"
+                            class="w-full h-full object-cover">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://res.cloudinary.com/dp55vvd7j/image/upload/v1741255926/cld-sample-3.jpg"
+                            class="w-full h-full object-cover">
+                    </div>
+                    <div class="carousel-item">
+                        <img src="https://res.cloudinary.com/dp55vvd7j/image/upload/v1741255923/samples/balloons.jpg"
+                            class="w-full h-full object-cover">
+                    </div>
+                    <!-- Carousel Controls -->
+                    <button id="prev-btn"
+                        class="absolute top-1/2 left-4 transform -translate-y-1/2 bg-white/70 rounded-full p-2 hover:bg-white">&lt;</button>
+                    <button id="next-btn"
+                        class="absolute top-1/2 right-4 transform -translate-y-1/2 bg-white/70 rounded-full p-2 hover:bg-white">&gt;</button>
+                </div>
+
+                <!--pages tiles-->
+                <div class="container py-8">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                        <div data-page="mandi" class="nav-btn card clickable-tile cursor-pointer bg-green-50">
+                            <h3 class="font-bold text-xl text-green-800">Mandi Prices</h3>
+                        </div>
+                        <div data-page="buyer" class="nav-btn card clickable-tile cursor-pointer bg-blue-50">
+                            <h3 class="font-bold text-xl text-blue-800">Buyer Connect</h3>
+                        </div>
+                        <div data-page="advisory" class="nav-btn card clickable-tile cursor-pointer bg-yellow-50">
+                            <h3 class="font-bold text-xl text-yellow-800">Advisory</h3>
+                        </div>
+                        <div data-page="schemes" class="nav-btn card clickable-tile cursor-pointer bg-red-50">
+                            <h3 class="font-bold text-xl text-red-800">Schemes</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!--weather-->
+                <div class="container grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="md:col-span-2 card bg-sky-100">
+                        <h2 class="text-2xl font-bold text-sky-800 mb-4">Today's Weather in Sarangpur East, Bihar</h2>
+                        <div class="flex items-center justify-around text-center">
+                            <div>
+                                <p class="text-5xl">☀️</p>
+                                <p class="text-xl font-semibold">32°C</p>
+                                <p class="text-gray-600">Sunny</p>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-700">Humidity: 65%</p>
+                                <p class="font-medium text-gray-700">Wind: 10 km/h</p>
+                                <p class="font-medium text-gray-700">Precipitation: 5%</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card bg-lime-100">
+                        <h2 class="text-2xl font-bold text-lime-800 mb-2">Quick Tip</h2>
+                        <p class="text-gray-700">With sunny days ahead, ensure proper irrigation for your Kharif crops.
+                            Consider mulching to retain soil moisture.</p>
+                    </div>
+                </div>
+
+                <!--Agriculture News-->
+                <div class="container py-8">
+                    <div class="card">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Latest Agriculture News</h2>
+                        <div id="news-container" class="space-y-4">
+                            <!-- <div class="p-4 bg-gray-50 rounded-lg border">
+                                <h3 class="font-bold text-gray-800">New MSP rates announced for Rabi crops.</h3>
+                                <p class="text-sm text-gray-600">The government has increased the Minimum Support Price
+                                    for wheat and mustard to support farmers.</p>
+                            </div>
+                            <div class="p-4 bg-gray-50 rounded-lg border">
+                                <h3 class="font-bold text-gray-800">Digital Mandi initiative expands to 50 new
+                                    districts.</h3>
+                                <p class="text-sm text-gray-600">The e-NAM platform now connects more farmers directly
+                                    to the market, ensuring better price discovery.</p>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-mandi" class="page-content container py-8 hidden">
+                <div class="card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6" data-translate="mandi_title">Daily Mandi Prices</h2>
+                    <div class="flex flex-col md:flex-row gap-4 mb-6">
+                        <div class="flex-1">
+                            <label for="mandi-state" class="block text-gray-700 font-medium mb-1" data-translate="label_state">State</label>
+                            <select id="mandi-state" class="form-input"></select>
+                        </div>
+                        <div class="flex-1">
+                            <label for="mandi-crop" class="block text-gray-700 font-medium mb-1" data-translate="label_crop">Crop</label>
+                            <select id="mandi-crop" class="form-input"></select>
+                        </div>
+                    </div>
+                    <table class="min-w-full bg-white border border-gray-200">
+                        <thead>
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Crop</th>
+                                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Price
+                                    (₹/Quintal)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="mandi-data-body"></tbody>
+                    </table>
+                    <div id="admin-price-update-section" class="mt-8 border-t pt-6 hidden">
+                        <h3 class="text-xl font-semibold mb-4 text-red-700">Admin: Update Crop Price</h3>
+                        <form id="update-price-form" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                            <div>
+                                <label for="update-state" class="block text-gray-700 font-medium">State</label>
+                                <select id="update-state" class="form-input" required></select>
+                            </div>
+                            <div>
+                                <label for="update-crop" class="block text-gray-700 font-medium">Crop</label>
+                                <select id="update-crop" class="form-input" required>
+                                    <option value="">-- Select a state first --</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="update-price" class="block text-gray-700 font-medium">New Price</label>
+                                <input type="number" id="update-price" class="form-input" required>
+                            </div>
+                            <button type="submit"
+                                class="w-full bg-red-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-red-700">Update</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-advisory" class="page-content container py-8 hidden">
+                <div class="card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Crop Advisory & Tips</h2>
+                    <div id="advisory-container" class="space-y-6"></div>
+                </div>
+            </section>
+
+            <section id="page-schemes" class="page-content container py-8 hidden">
+                <div class="card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Government Schemes for Farmers</h2>
+                    <div id="schemes-container" class="space-y-6"></div>
+
+                </div>
+            </section>
+
+            <section id="page-buyer" class="page-content container py-8 hidden">
+                <div class="card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Buyer & Farmer Connect</h2>
+                    <div id="buyer-form-section" class="hidden">
+                        <form id="buyer-form" class="space-y-4 mb-8 border-b pb-8">
+                            <div>
+                                <label for="buyer-crop-input" class="block text-gray-700 font-medium">Crop You
+                                    Need</label>
+                                <input type="text" id="buyer-crop-input" class="form-input" required>
+                            </div>
+                            <div>
+                                <label for="buyer-quantity-input" class="block text-gray-700 font-medium">Quantity (in
+                                    quintals)</label>
+                                <input type="number" id="buyer-quantity-input" class="form-input" required>
+                            </div>
+                            <div>
+                                <label for="buyer-contact-input" class="block text-gray-700 font-medium">Your Contact
+                                    Number</label>
+                                <input type="tel" id="buyer-contact-input" class="form-input"
+                                    placeholder="e.g., 9876543210" required>
+                            </div>
+                            <button type="submit"
+                                class="w-full bg-green-600 text-white font-semibold py-3 rounded-lg hover:bg-green-700">Submit
+                                Request</button>
+                        </form>
+                    </div>
+                    <div id="buyer-login-prompt" class="text-center p-4 bg-yellow-100 rounded-lg mb-6">
+                        <p>Please log in as a buyer to post a new request.</p>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4">Recent Requests</h3>
+                    <div id="buyer-requests" class="space-y-4">
+                    </div>
+                </div>
+            </section>
+
+            <section id="page-admin" class="page-content container py-8 hidden">
+                <h1 class="text-3xl font-bold text-gray-800 mb-6">Admin Panel</h1>
+                <div class="card mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Manage News</h2>
+                    <form id="add-news-form" class="space-y-4 mb-6 border-b pb-6">
+                        <input type="text" id="news-headline" placeholder="Headline" class="form-input" required>
+                        <textarea id="news-subtopic" placeholder="Subtopic/Description" class="form-input"
+                            required></textarea>
+                        <input type="url" id="news-link" placeholder="https://example.com/full-story" class="form-input"
+                            required>
+                        <button type="submit"
+                            class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700">Add
+                            News</button>
+                    </form>
+                    <div id="admin-news-list" class="space-y-2"></div>
+                </div>
+                <div class="card mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Manage Schemes</h2>
+                    <form id="add-scheme-form" class="space-y-4 mb-6 border-b pb-6">
+                        <input type="text" id="scheme-title" placeholder="Scheme Title" class="form-input" required>
+                        <textarea id="scheme-description" placeholder="Description" class="form-input"
+                            required></textarea>
+                        <input type="url" id="scheme-link" placeholder="https://example.gov.in/scheme"
+                            class="form-input">
+                        <button type="submit"
+                            class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700">Add
+                            Scheme</button>
+                    </form>
+                    <div id="admin-schemes-list" class="space-y-2"></div>
+                </div>
+                <div class="card">
+                    <h2 class="text-2xl font-semibold mb-4">Manage Advisory Tips</h2>
+                    <form id="add-advisory-form" class="space-y-4 mb-6 border-b pb-6">
+                        <input type="text" id="advisory-title" placeholder="Tip Title" class="form-input" required>
+                        <textarea id="advisory-description" placeholder="Description" class="form-input"
+                            required></textarea>
+                        <button type="submit"
+                            class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700">Add
+                            Advisory Tip</button>
+                    </form>
+                    <div id="admin-advisory-list" class="space-y-2"></div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="bg-gray-800 text-white py-8 mt-auto">
+            <div class="container text-center">
+                <p>&copy; 2025 AgriMandi Connect. All Rights Reserved.</p>
+            </div>
+        </footer>
+
+        <div id="login-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" data-modal="login-modal">&times;</span>
+                <h2 class="text-2xl font-bold mb-4">Login</h2>
+                <form id="login-form">
+                    <div class="mb-4">
+                        <label for="login-email" class="block text-gray-700">Email</label>
+                        <input type="email" id="login-email" class="form-input" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="login-password" class="block text-gray-700">Password</label>
+                        <input type="password" id="login-password" class="form-input" required>
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg">Login</button>
+                    <p class="text-center text-sm mt-4">Don't have an account? <a href="#" id="show-register-link"
+                            class="text-blue-600">Register here</a></p>
+                </form>
+            </div>
+        </div>
+        <div id="register-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" data-modal="register-modal">&times;</span>
+                <h2 class="text-2xl font-bold mb-4">Register</h2>
+                <form id="register-form">
+                    <div class="mb-4">
+                        <label for="register-name">Full Name</label>
+                        <input type="text" id="register-name" class="form-input" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" class="form-input" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" class="form-input" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="register-role">I am a:</label>
+                        <select id="register-role" class="form-input" required>
+                            <option value="">-- Select Role --</option>
+                            <option value="farmer">Farmer</option>
+                            <option value="buyer">Buyer</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg">Register</button>
+                    <p class="text-center text-sm mt-4">Already have an account? <a href="#" id="show-login-link"
+                            class="text-blue-600">Login here</a></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let currentUser = null;
+            let allMandiData = [];
+            const pages = document.querySelectorAll('.page-content');
+            //const navButtons = document.querySelectorAll('.nav-btn');
+            const authLinksContainer = document.getElementById('auth-links');
+            const mainNavLinks = document.getElementById('main-nav-links');
+            const indianStates = ["Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal"];
+
+            // --- NEW: Translations Object ---
+            const translations = {
+                en: {
+                    nav_home: "Home", nav_mandi: "Mandi Prices", nav_buyer: "Buyer Connect", nav_advisory: "Advisory", nav_schemes: "Schemes",
+                    weather_title: "Today's Weather in Sarangpur East, Bihar", weather_sunny: "Sunny", weather_humidity: "Humidity: 65%", weather_wind: "Wind: 10 km/h",
+                    quick_tip_title: "Quick Tip", quick_tip_text: "With sunny days ahead, ensure proper irrigation. Consider mulching to retain soil moisture.",
+                    news_title: "Latest Agriculture News", welcome_user: "Welcome"
+                },
+                hi: {
+                    nav_home: "होम", nav_mandi: "मंडी मूल्य", nav_buyer: "क्रेता कनेक्ट", nav_advisory: "सलाह", nav_schemes: "योजनाएं",
+                    weather_title: "सारंगपुर पूर्व, बिहार में आज का मौसम", weather_sunny: "धूप", weather_humidity: "नमी: 65%", weather_wind: "हवा: 10 किमी/घंटा",
+                    quick_tip_title: "त्वरित सुझाव", quick_tip_text: "आगे धूप वाले दिनों के साथ, उचित सिंचाई सुनिश्चित करें। मिट्टी की नमी बनाए रखने के लिए मल्चिंग पर विचार करें।",
+                    news_title: "नवीनतम कृषि समाचार", welcome_user: "आपका स्वागत है"
+                }
+            };
+
+
+            // --- NEW: Language Switcher Logic ---
+            const languageSwitcher = document.getElementById('language-switcher');
+            const setLanguage = (lang) => {
+                document.querySelectorAll('[data-translate]').forEach(el => {
+                    const key = el.dataset.translate;
+                    el.textContent = translations[lang][key] || el.textContent;
+                });
+                // Also update dynamic welcome message
+                updateUIForAuthState();
+            };
+            languageSwitcher.addEventListener('change', (e) => setLanguage(e.target.value));
+
+            // --- Page Navigation Logic ---
+            // const showPage = (pageId) => {
+            //     pages.forEach(page => page.classList.add('hidden'));
+            //     document.getElementById(`page-${pageId}`).classList.remove('hidden');
+            //     window.scrollTo(0, 0);
+            // };
+            // navButtons.forEach(button => button.addEventListener('click', () => showPage(button.dataset.page)));
+            const showPage = (pageId) => {
+                pages.forEach(page => page.classList.add('hidden'));
+                const pageToShow = document.getElementById(`page-${pageId}`);
+                if (pageToShow) {
+                    pageToShow.classList.remove('hidden');
+                }
+                window.scrollTo(0, 0);
+            };
+
+
+            const openModal = (modalId) => document.getElementById(modalId).style.display = 'block';
+            const closeModal = (modalId) => document.getElementById(modalId).style.display = 'none';
+
+            document.querySelectorAll('.close-btn').forEach(btn => btn.addEventListener('click', () => closeModal(btn.dataset.modal)));
+            document.getElementById('show-register-link').addEventListener('click', (e) => { e.preventDefault(); closeModal('login-modal'); openModal('register-modal'); });
+            document.getElementById('show-login-link').addEventListener('click', (e) => { e.preventDefault(); closeModal('register-modal'); openModal('login-modal'); });
+
+            const updateUIForAuthState = () => {
+
+                let navHTML = `
+                <button data-page="home" class="nav-btn hover:text-green-700">Home</button>
+                <button data-page="mandi" class="nav-btn hover:text-green-700">Mandi Prices</button>
+                <button data-page="buyer" class="nav-btn hover:text-green-700">Buyer Connect</button>
+                <button data-page="advisory" class="nav-btn hover:text-green-700">Advisory</button>
+                <button data-page="schemes" class="nav-btn hover:text-green-700">Schemes</button>`;
+
+                if (currentUser?.role === 'admin') {
+                    navHTML += `<button data-page="admin" class="nav-btn bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">Admin Panel</button>`;
+                }
+                mainNavLinks.innerHTML = navHTML;
+
+                // Re-add event listeners to the new nav buttons
+                document.querySelectorAll('.nav-btn').forEach(button => {
+                    button.addEventListener('click', () => showPage(button.dataset.page));
+                });
+
+                //const lang = languageSwitcher.value;
+                if (currentUser) {
+                    authLinksContainer.innerHTML = `<span class="font-medium text-gray-700">Welcome, ${currentUser.name} (${currentUser.role})</span><button id="logout-btn" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Logout</button>`;
+                    document.getElementById('logout-btn').addEventListener('click', handleLogout);
+                } else {
+                    authLinksContainer.innerHTML = `<button id="login-btn" class="text-gray-600 hover:text-green-700 font-medium">Login</button><button id="register-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Register</button>`;
+                    document.getElementById('login-btn').addEventListener('click', () => openModal('login-modal'));
+                    document.getElementById('register-btn').addEventListener('click', () => openModal('register-modal'));
+                }
+                // Other UI updates remain the same...
+                // Part 3: Update page sections based on role
+                const buyerFormSection = document.getElementById('buyer-form-section');
+                if (buyerFormSection) buyerFormSection.style.display = currentUser?.role === 'buyer' ? 'block' : 'none';
+
+                const buyerLoginPrompt = document.getElementById('buyer-login-prompt');
+                if (buyerLoginPrompt) buyerLoginPrompt.style.display = currentUser?.role === 'buyer' ? 'none' : 'block';
+
+                const adminPriceUpdateSection = document.getElementById('admin-price-update-section');
+                if (adminPriceUpdateSection) adminPriceUpdateSection.style.display = currentUser?.role === 'admin' ? 'block' : 'none';
+
+                //fetchBuyerRequests();
+            };
+
+
+            //authentication logic
+            const checkAuthStatus = async () => {
+                try {
+                    const response = await fetch('/api/auth/status');
+                    const data = await response.json();
+                    currentUser = data.loggedIn ? data.user : null;
+                } catch (error) {
+                    console.error("Auth check failed:", error);
+                    currentUser = null;
+                }
+                updateUIForAuthState();
+            };
+
+
+            // --- NEW: DYNAMIC CONTENT FETCHING ---
+            const fetchNews = async () => {
+                const response = await fetch('/api/news');
+                const newsItems = await response.json();
+                const container = document.getElementById('news-container');
+                container.innerHTML = newsItems.length ? '' : '<p>No news updates at the moment.</p>';
+                newsItems.forEach(item => {
+                    container.innerHTML += `
+                    <div class="p-4 bg-gray-50 rounded-lg border">
+                        <h3 class="font-bold text-gray-800">${item.headline}</h3>
+                        <p class="text-sm text-gray-600">${item.subtopic}</p>
+                        <a href="${item.link}" target="_blank" class="text-sm text-blue-600 hover:underline">Read More &rarr;</a>
+                    </div>`;
+                });
+            };
+
+            const fetchSchemes = async () => {
+                const response = await fetch('/api/schemes');
+                const schemes = await response.json();
+                const container = document.getElementById('schemes-container');
+                container.innerHTML = schemes.length ? '' : '<p>No schemes to display.</p>';
+                schemes.forEach(item => {
+                    container.innerHTML += `
+                    <div class="p-6 bg-yellow-50 rounded-lg border border-yellow-200">
+                        <h3 class="font-bold text-lg text-yellow-800 mb-2">${item.title}</h3>
+                        <p class="text-gray-700">${item.description}</p>
+                        ${item.link ? `<a href="${item.link}" target="_blank" class="mt-2 inline-block text-blue-600 hover:underline font-semibold">Learn More &rarr;</a>` : ''}
+                    </div>`;
+                });
+            };
+
+            const fetchAdvisory = async () => {
+                const response = await fetch('/api/advisory');
+                const tips = await response.json();
+                const container = document.getElementById('advisory-container');
+                container.innerHTML = tips.length ? '' : '<p>No advisory tips available.</p>';
+                tips.forEach(item => {
+                    container.innerHTML += `
+                    <div class="p-6 bg-green-50 rounded-lg border border-green-200">
+                        <h3 class="font-bold text-lg text-green-800 mb-2">${item.title}</h3>
+                        <p class="text-gray-700">${item.description}</p>
+                    </div>`;
+                });
+            };
+
+            // --- NEW: ADMIN PANEL LOGIC ---
+
+            // Generic function to render items in the admin panel
+            const renderAdminList = async (endpoint, containerId, fields) => {
+                const response = await fetch(endpoint);
+                const items = await response.json();
+                const container = document.getElementById(containerId);
+                container.innerHTML = '';
+                items.forEach(item => {
+                    container.innerHTML += `
+                    <div class="flex justify-between items-center p-2 border-b">
+                        <span>${item[fields[0]]}</span>
+                        <button data-id="${item._id}" class="delete-btn text-red-500 hover:text-red-700 text-sm">Delete</button>
+                    </div>`;
+                });
+            };
+
+            // Function to load all data for the admin panel
+            const loadAdminPanelData = () => {
+                if (currentUser?.role === 'admin') {
+                    renderAdminList('/api/news', 'admin-news-list', ['headline']);
+                    renderAdminList('/api/schemes', 'admin-schemes-list', ['title']);
+                    renderAdminList('/api/advisory', 'admin-advisory-list', ['title']);
+                }
+            };
+
+            // Event listener for showing the admin page
+            document.addEventListener('click', e => {
+                if (e.target && e.target.dataset.page === 'admin') {
+                    loadAdminPanelData();
+                }
+            });
+
+            // Generic function to handle form submissions for adding items
+            const handleAddFormSubmit = async (e, endpoint, body, callback) => {
+                e.preventDefault();
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+                if (response.ok) {
+                    e.target.reset();
+                    callback(); // Reload the list
+                } else {
+                    alert('Failed to add item.');
+                }
+            };
+
+            document.getElementById('add-news-form').addEventListener('submit', (e) => handleAddFormSubmit(e, '/api/news', {
+                headline: document.getElementById('news-headline').value,
+                subtopic: document.getElementById('news-subtopic').value,
+                link: document.getElementById('news-link').value
+            }, () => renderAdminList('/api/news', 'admin-news-list', ['headline'])));
+
+            document.getElementById('add-scheme-form').addEventListener('submit', (e) => handleAddFormSubmit(e, '/api/schemes', {
+                title: document.getElementById('scheme-title').value,
+                description: document.getElementById('scheme-description').value,
+                link: document.getElementById('scheme-link').value
+            }, () => renderAdminList('/api/schemes', 'admin-schemes-list', ['title'])));
+
+            document.getElementById('add-advisory-form').addEventListener('submit', (e) => handleAddFormSubmit(e, '/api/advisory', {
+                title: document.getElementById('advisory-title').value,
+                description: document.getElementById('advisory-description').value
+            }, () => renderAdminList('/api/advisory', 'admin-advisory-list', ['title'])));
+
+
+            // Event delegation for delete buttons
+            document.getElementById('page-admin').addEventListener('click', async (e) => {
+                if (e.target && e.target.classList.contains('delete-btn')) {
+                    const id = e.target.dataset.id;
+                    const listContainer = e.target.closest('.card').querySelector('[id^="admin-"]').id;
+                    let endpoint = '';
+                    if (listContainer.includes('news')) endpoint = `/api/news/${id}`;
+                    if (listContainer.includes('schemes')) endpoint = `/api/schemes/${id}`;
+                    if (listContainer.includes('advisory')) endpoint = `/api/advisory/${id}`;
+
+                    if (confirm('Are you sure you want to delete this item?')) {
+                        const response = await fetch(endpoint, { method: 'DELETE' });
+                        if (response.ok) {
+                            loadAdminPanelData(); // Refresh all lists
+                        } else {
+                            alert('Failed to delete item.');
+                        }
+                    }
+                }
+            });
+
+
+            // --- NEW: Image Carousel Logic ---
+            const carouselItems = document.querySelectorAll('.carousel-item');
+            let currentIndex = 0;
+            let carouselInterval;
+
+            const showSlide = (index) => {
+                carouselItems.forEach((item, i) => {
+                    item.classList.toggle('active', i === index);
+                });
+            };
+
+            const nextSlide = () => {
+                currentIndex = (currentIndex + 1) % carouselItems.length;
+                showSlide(currentIndex);
+            };
+
+            const prevSlide = () => {
+                currentIndex = (currentIndex - 1 + carouselItems.length) % carouselItems.length;
+                showSlide(currentIndex);
+            };
+
+            const startCarousel = () => {
+                carouselInterval = setInterval(nextSlide, 4000); // Change image every 4 seconds
+            };
+
+            const stopCarousel = () => clearInterval(carouselInterval);
+
+            document.getElementById('next-btn').addEventListener('click', () => { stopCarousel(); nextSlide(); startCarousel(); });
+            document.getElementById('prev-btn').addEventListener('click', () => { stopCarousel(); prevSlide(); startCarousel(); });
+
+            const carouselElement = document.getElementById('image-carousel');
+            carouselElement.addEventListener('mouseenter', stopCarousel);
+            carouselElement.addEventListener('mouseleave', startCarousel);
+
+
+
+            document.getElementById('register-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const body = { name: e.target.elements['register-name'].value, email: e.target.elements['register-email'].value, password: e.target.elements['register-password'].value, role: e.target.elements['register-role'].value };
+                const response = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                if (response.ok) { alert('Registration successful! Please log in.'); closeModal('register-modal'); openModal('login-modal'); } else { const err = await response.json(); alert(`Registration failed: ${err.message}`); }
+            });
+
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const body = { email: e.target.elements['login-email'].value, password: e.target.elements['login-password'].value };
+                const response = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                if (response.ok) { const data = await response.json(); currentUser = data.user; closeModal('login-modal'); updateUIForAuthState(); } else { alert('Login failed. Please check your credentials.'); }
+            });
+
+            const handleLogout = async () => { await fetch('/api/auth/logout', { method: 'POST' }); currentUser = null; updateUIForAuthState(); };
+
+            // --- MANdi PRICE LOGIC (CORRECTED) ---
+
+            const displayMandiData = () => {
+                const selectedState = document.getElementById('mandi-state').value;
+                const selectedCrop = document.getElementById('mandi-crop').value;
+                let filteredData = allMandiData;
+                if (selectedState) {
+                    filteredData = filteredData.filter(item => item.state === selectedState);
+                }
+                if (selectedCrop) {
+                    filteredData = filteredData.filter(item => item.crop === selectedCrop);
+                }
+                const mandiDataBody = document.getElementById('mandi-data-body');
+
+                mandiDataBody.innerHTML = '';
+                filteredData.forEach(item => {
+                    // REPLACE IT WITH THIS LINE
+                    mandiDataBody.innerHTML += `<tr><td class="px-6 py-4">${item.crop} <span class="text-xs text-gray-500 italic">(${item.state})</span></td><td class="px-6 py-4 font-medium">₹ ${item.price}</td></tr>`;
+                });
+            };
+
+            // NEW FUNCTION: To populate the crop dropdown based on the selected state
+            const updateMandiFilters = () => {
+                const selectedState = document.getElementById('mandi-state').value;
+                const mandiCropSelect = document.getElementById('mandi-crop');
+
+                const relevantData = selectedState ? allMandiData.filter(item => item.state === selectedState) : allMandiData;
+                const crops = [...new Set(relevantData.map(item => item.crop))].sort();
+
+                // Clear and repopulate the crop dropdown
+                mandiCropSelect.innerHTML = '<option value="">All Crops</option>';
+                crops.forEach(crop => {
+                    mandiCropSelect.innerHTML += `<option value="${crop}">${crop}</option>`;
+                });
+
+                // After updating the filters, update the table
+                displayMandiData();
+            };
+
+            // MODIFIED: This function now calls the new filter update function
+            const fetchMandiData = async () => {
+                try {
+                    const response = await fetch('/api/mandi');
+                    allMandiData = await response.json();
+                    updateMandiFilters(); // This now correctly populates filters on initial load
+                    populateAdminStateDropdown();
+                } catch (error) {
+                    console.error("Failed to fetch mandi data:", error);
+                }
+            };
+
+            // --- NEW/MODIFIED: ADMIN PANEL LOGIC ---
+
+            const adminStateSelect = document.getElementById('update-state');
+            const adminCropSelect = document.getElementById('update-crop');
+            const updatePriceForm = document.getElementById('update-price-form');
+
+            const populateAdminStateDropdown = () => {
+                adminStateSelect.innerHTML = '<option value="">-- Select State --</option>';
+                indianStates.forEach(state => {
+                    adminStateSelect.innerHTML += `<option value="${state}">${state}</option>`;
+                });
+            };
+
+            // NEW: Function to populate the admin's crop dropdown based on state selection
+            const updateAdminCropDropdown = () => {
+                const selectedState = adminStateSelect.value;
+                adminCropSelect.innerHTML = '<option value="">-- Select Crop --</option>';
+
+                if (selectedState) {
+                    const relevantData = allMandiData.filter(item => item.state === selectedState);
+                    const crops = [...new Set(relevantData.map(item => item.crop))].sort();
+                    crops.forEach(crop => {
+                        adminCropSelect.innerHTML += `<option value="${crop}">${crop}</option>`;
+                    });
+                }
+            };
+
+            // NEW: Event listener for the admin state dropdown
+            adminStateSelect.addEventListener('change', updateAdminCropDropdown);
+
+            // NEW: Event listener to fix the form submission bug
+            updatePriceForm.addEventListener('submit', async (e) => {
+                e.preventDefault(); // This stops the page from reloading
+
+                const body = {
+                    state: adminStateSelect.value,
+                    crop: adminCropSelect.value,
+                    price: document.getElementById('update-price').value,
+                };
+
+                if (!body.state || !body.crop || !body.price) {
+                    alert('Please fill out all fields.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/mandi/update', {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+
+                    if (response.ok) {
+                        alert('Price updated successfully!');
+                        updatePriceForm.reset(); // Clear the form
+                        adminCropSelect.innerHTML = '<option value="">-- Select a state first --</option>'; // Reset crop dropdown
+                        fetchMandiData(); // Refresh the data in the table
+                    } else {
+                        const error = await response.json();
+                        alert(`Update failed: ${error.message}`);
+                    }
+                } catch (error) {
+                    console.error('Error updating price:', error);
+                    alert('An error occurred. Please try again.');
+                }
+            });
+
+
+
+            const fetchBuyerRequests = async () => {
+                try {
+                    const response = await fetch('/api/buyers');
+                    const requests = await response.json();
+                    const buyerRequestsDiv = document.getElementById('buyer-requests');
+                    buyerRequestsDiv.innerHTML = requests.length === 0 ? `<p class="text-gray-500">No active requests found.</p>` : '';
+                    requests.forEach(req => {
+                        const isCompleted = req.status === 'completed';
+                        buyerRequestsDiv.innerHTML += `
+                        <div class="card bg-gray-50 border ${isCompleted ? 'border-green-400' : 'border-gray-200'}">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-bold text-lg">${req.crop} - ${req.quantity} quintals</h4>
+                                    <p class="text-sm text-gray-600">Posted by: ${req.buyerName}</p>
+                                    <p class="text-sm text-gray-600">Contact: ${req.contactNumber}</p>
+                                </div>
+                                <span class="font-semibold px-3 py-1 text-sm rounded-full capitalize ${isCompleted ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">${req.status}</span>
+                            </div>
+                            ${isCompleted ? `<div class="mt-4 pt-4 border-t border-green-300"><p class="font-semibold text-green-700">Accepted by Farmer: ${req.acceptedByFarmerName}</p><p class="text-sm text-gray-600">Farmer Contact: ${req.acceptedByFarmerContact}</p></div>` : ''}
+                            ${(currentUser?.role === 'farmer' && !isCompleted) ? `<button data-request-id="${req._id}" class="accept-request-btn mt-4 bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600">Accept This Request</button>` : ''}
+                        </div>`;
+                    });
+                    document.querySelectorAll('.accept-request-btn').forEach(btn => {
+                        btn.addEventListener('click', async () => {
+                            const farmerContact = prompt("Please enter your contact number to share with the buyer:");
+                            if (!farmerContact) { alert("Contact number is required."); return; }
+                            const res = await fetch(`/api/requests/${btn.dataset.requestId}/accept`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ farmerContact }) });
+                            if (res.ok) { alert('Request accepted!'); fetchBuyerRequests(); } else { alert('Failed to accept request.'); }
+                        });
+                    });
+                } catch (error) { console.error("Failed to fetch buyer requests:", error); }
+            };
+
+            document.getElementById('buyer-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const body = { crop: e.target.elements['buyer-crop-input'].value, quantity: e.target.elements['buyer-quantity-input'].value, contactNumber: e.target.elements['buyer-contact-input'].value };
+                const response = await fetch('/api/buyers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                if (response.ok) { alert('Request submitted!'); e.target.reset(); fetchBuyerRequests(); } else { alert('Failed to submit request.'); }
+            });
+
+            const initializeApp = async () => {
+                await checkAuthStatus();
+
+                const stateDropdowns = [document.getElementById('mandi-state'), document.getElementById('update-state')];
+
+                stateDropdowns.forEach(select => {
+                    select.innerHTML = '<option value="">All States</option>';
+                    indianStates.forEach(state => {
+                        select.innerHTML += `<option value="${state}">${state}</option>`;
+                    });
+                });
+
+                // Fetch dynamic content for public pages
+                fetchNews();
+                fetchSchemes();
+                fetchAdvisory();
+                fetchMandiData();
+                fetchBuyerRequests();
+
+
+                // MODIFIED: The event listeners now call the correct functions
+                document.getElementById('mandi-state').addEventListener('change', updateMandiFilters);
+                document.getElementById('mandi-crop').addEventListener('change', displayMandiData);
+
+                // Setup initial event listeners that don't depend on dynamic content
+                document.querySelectorAll('.close-btn').forEach(btn => btn.addEventListener('click', () => closeModal(btn.dataset.modal)));
+
+                // FIX: Add event listeners to static elements that are always on the page
+                document.querySelectorAll('#page-home .clickable-tile').forEach(tile => {
+                    tile.addEventListener('click', () => showPage(tile.dataset.page));
+                });
+
+
+                showPage('home');
+                setLanguage(languageSwitcher.value); // Set initial language
+                startCarousel(); // Start the carousel on load
+            };
+
+            initializeApp();
+        });
+    </script>
+</body>
+
+</html>
