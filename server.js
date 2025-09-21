@@ -3,6 +3,7 @@ const { MongoClient, ObjectId } = require('mongodb');
 const path = require('path');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
+const axios = require('axios');
 require('dotenv').config();
 
 const app = express();
@@ -123,6 +124,35 @@ app.delete('/api/schemes/:id', ...adminGuard, (req, res) => deleteCollectionItem
 // Advisory Management
 app.post('/api/advisory', ...adminGuard, (req, res) => addCollectionItem('advisory', req, res));
 app.delete('/api/advisory/:id', ...adminGuard, (req, res) => deleteCollectionItem('advisory', req, res));
+
+
+// --- NEW: WEATHER API ENDPOINT ---
+app.get('/api/weather', async (req, res) => {
+    const { lat, lon } = req.query;
+    if (!lat || !lon) {
+        return res.status(400).json({ message: "Latitude and longitude are required." });
+    }
+
+    const apiKey = process.env.OPENWEATHER_API_KEY;
+    const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`;
+
+    try {
+        const response = await axios.get(url);
+        const data = response.data;
+
+        // Send a simplified weather object to the frontend
+        res.json({
+            location: data.name,
+            temperature: data.main.temp,
+            condition: data.weather[0].main,
+            humidity: data.main.humidity,
+            windSpeed: data.wind.speed, // in meter/sec
+        });
+    } catch (error) {
+        console.error("Error fetching weather data:", error.response?.data || error.message);
+        res.status(500).json({ message: "Failed to fetch weather data." });
+    }
+});
 
 
 // --- AUTHENTICATION API ENDPOINTS ---

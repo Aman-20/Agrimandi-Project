@@ -112,15 +112,15 @@
                 <!-- 1. Image Carousel -->
                 <div id="image-carousel" class="relative w-full h-96 overflow-hidden shadow-lg">
                     <div class="carousel-item active">
-                        <img src="https://res.cloudinary.com/dp55vvd7j/image/upload/v1741255925/cld-sample-2.jpg"
+                        <img src="https://res.cloudinary.com/dp55vvd7j/image/upload/v1758301493/farmer-banner_im2nez.jpg"
                             class="w-full h-full object-cover">
                     </div>
                     <div class="carousel-item">
-                        <img src="https://res.cloudinary.com/dp55vvd7j/image/upload/v1741255926/cld-sample-3.jpg"
+                        <img src="https://res.cloudinary.com/dp55vvd7j/image/upload/v1758301491/Template-landscape-of-agriculture-and-farming-on-banner-8-large_rpvtor.jpg"
                             class="w-full h-full object-cover">
                     </div>
                     <div class="carousel-item">
-                        <img src="https://res.cloudinary.com/dp55vvd7j/image/upload/v1741255923/samples/balloons.jpg"
+                        <img src="https://res.cloudinary.com/dp55vvd7j/image/upload/v1758301487/image1_ttsey7.webp"
                             class="w-full h-full object-cover">
                     </div>
                     <!-- Carousel Controls -->
@@ -151,24 +151,19 @@
                 <!--weather-->
                 <div class="container grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div class="md:col-span-2 card bg-sky-100">
-                        <h2 class="text-2xl font-bold text-sky-800 mb-4">Today's Weather in Sarangpur East, Bihar</h2>
-                        <div class="flex items-center justify-around text-center">
-                            <div>
-                                <p class="text-5xl">☀️</p>
-                                <p class="text-xl font-semibold">32°C</p>
-                                <p class="text-gray-600">Sunny</p>
-                            </div>
-                            <div>
-                                <p class="font-medium text-gray-700">Humidity: 65%</p>
-                                <p class="font-medium text-gray-700">Wind: 10 km/h</p>
-                                <p class="font-medium text-gray-700">Precipitation: 5%</p>
-                            </div>
+                        <h2 id="weather-location" class="text-2xl font-bold text-sky-800 mb-4">Fetching weather...</h2>
+                        <div id="weather-content" class="flex items-center justify-around text-center">
+                        </div>
+                        <div id="weather-error" class="text-center text-red-600 hidden">
+                            Could not fetch weather data. Please enable location services.
                         </div>
                     </div>
+
                     <div class="card bg-lime-100">
                         <h2 class="text-2xl font-bold text-lime-800 mb-2">Quick Tip</h2>
-                        <p class="text-gray-700">With sunny days ahead, ensure proper irrigation for your Kharif crops.
-                            Consider mulching to retain soil moisture.</p>
+                        <p class="text-gray-700">•Best Practices for Harvesting Kharif Paddy (Rice)</p>
+                        <p class="text-gray-700">•Prepare Your Fields for Rabi Season (Wheat & Mustard)</p>
+                        <p class="text-gray-700">•Critical Pest Alert: Managing Gundhi Bug in Mature Paddy</p>
                     </div>
                 </div>
 
@@ -195,14 +190,17 @@
 
             <section id="page-mandi" class="page-content container py-8 hidden">
                 <div class="card">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6" data-translate="mandi_title">Daily Mandi Prices</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6" data-translate="mandi_title">Daily Mandi Prices
+                    </h2>
                     <div class="flex flex-col md:flex-row gap-4 mb-6">
                         <div class="flex-1">
-                            <label for="mandi-state" class="block text-gray-700 font-medium mb-1" data-translate="label_state">State</label>
+                            <label for="mandi-state" class="block text-gray-700 font-medium mb-1"
+                                data-translate="label_state">State</label>
                             <select id="mandi-state" class="form-input"></select>
                         </div>
                         <div class="flex-1">
-                            <label for="mandi-crop" class="block text-gray-700 font-medium mb-1" data-translate="label_crop">Crop</label>
+                            <label for="mandi-crop" class="block text-gray-700 font-medium mb-1"
+                                data-translate="label_crop">Crop</label>
                             <select id="mandi-crop" class="form-input"></select>
                         </div>
                     </div>
@@ -433,13 +431,7 @@
             };
             languageSwitcher.addEventListener('change', (e) => setLanguage(e.target.value));
 
-            // --- Page Navigation Logic ---
-            // const showPage = (pageId) => {
-            //     pages.forEach(page => page.classList.add('hidden'));
-            //     document.getElementById(`page-${pageId}`).classList.remove('hidden');
-            //     window.scrollTo(0, 0);
-            // };
-            // navButtons.forEach(button => button.addEventListener('click', () => showPage(button.dataset.page)));
+
             const showPage = (pageId) => {
                 pages.forEach(page => page.classList.add('hidden'));
                 const pageToShow = document.getElementById(`page-${pageId}`);
@@ -511,6 +503,52 @@
                     currentUser = null;
                 }
                 updateUIForAuthState();
+            };
+
+            // ... after checkAuthStatus function
+
+            const getWeatherEmoji = (condition) => {
+                switch (condition) {
+                    case 'Clear': return '☀️';
+                    case 'Clouds': return '☁️';
+                    case 'Rain': return '🌧️';
+                    case 'Drizzle': return '🌦️';
+                    case 'Thunderstorm': return '⛈️';
+                    case 'Snow': return '❄️';
+                    case 'Mist':
+                    case 'Fog':
+                    case 'Haze':
+                        return '🌫️';
+                    default: return '🌡️';
+                }
+            };
+
+            const fetchWeather = async (lat, lon) => {
+                try {
+                    const response = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
+                    if (!response.ok) throw new Error('Failed to fetch');
+                    const weather = await response.json();
+
+                    document.getElementById('weather-location').textContent = `Today's Weather in ${weather.location}`;
+                    document.getElementById('weather-content').innerHTML = `
+            <div>
+                <p class="text-5xl">${getWeatherEmoji(weather.condition)}</p>
+                <p class="text-xl font-semibold">${Math.round(weather.temperature)}°C</p>
+                <p class="text-gray-600">${weather.condition}</p>
+            </div>
+            <div>
+                <p class="font-medium text-gray-700">Humidity: ${weather.humidity}%</p>
+                <p class="font-medium text-gray-700">Wind: ${(weather.windSpeed * 3.6).toFixed(1)} km/h</p>
+                <p class="font-medium text-gray-700">Precipitation: 5%</p> </div>
+        `;
+                    document.getElementById('weather-error').classList.add('hidden');
+
+                } catch (error) {
+                    console.error("Weather fetch error:", error);
+                    document.getElementById('weather-location').textContent = `Today's Weather`;
+                    document.getElementById('weather-content').classList.add('hidden');
+                    document.getElementById('weather-error').classList.remove('hidden');
+                }
             };
 
 
@@ -862,6 +900,23 @@
 
             const initializeApp = async () => {
                 await checkAuthStatus();
+
+                // ADD THIS BLOCK to get location and fetch weather
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const { latitude, longitude } = position.coords;
+                            fetchWeather(latitude, longitude);
+                        },
+                        () => { // Error/denial case
+                            console.error(`Geolocation error: ${error.message}`);
+                            fetchWeather(25.5941, 85.1376); // Fallback to Patna, Bihar
+                            console.log("Geolocation denied. Falling back to default location.");
+                        }
+                    );
+                } else {
+                    fetchWeather(19.0760, 72.8777); // Fallback for older browsers
+                }
 
                 const stateDropdowns = [document.getElementById('mandi-state'), document.getElementById('update-state')];
 
