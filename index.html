@@ -134,16 +134,16 @@
                 <div class="container py-8">
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                         <div data-page="mandi" class="nav-btn card clickable-tile cursor-pointer bg-green-50">
-                            <h3 class="font-bold text-xl text-green-800">Mandi Prices</h3>
+                            <h3 class="font-bold text-xl text-green-800" data-translate="nav_mandi">Mandi Prices</h3>
                         </div>
                         <div data-page="buyer" class="nav-btn card clickable-tile cursor-pointer bg-blue-50">
-                            <h3 class="font-bold text-xl text-blue-800">Buyer Connect</h3>
+                            <h3 class="font-bold text-xl text-blue-800" data-translate="nav_buyer">Buyer Connect</h3>
                         </div>
                         <div data-page="advisory" class="nav-btn card clickable-tile cursor-pointer bg-yellow-50">
-                            <h3 class="font-bold text-xl text-yellow-800">Advisory</h3>
+                            <h3 class="font-bold text-xl text-yellow-800"  data-translate="nav_advisory">Advisory</h3>
                         </div>
                         <div data-page="schemes" class="nav-btn card clickable-tile cursor-pointer bg-red-50">
-                            <h3 class="font-bold text-xl text-red-800">Schemes</h3>
+                            <h3 class="font-bold text-xl text-red-800" data-translate="nav_schemes">Schemes</h3>
                         </div>
                     </div>
                 </div>
@@ -160,7 +160,7 @@
                     </div>
 
                     <div class="card bg-lime-100">
-                        <h2 class="text-2xl font-bold text-lime-800 mb-2">Quick Tip</h2>
+                        <h2 class="text-2xl font-bold text-lime-800 mb-2" data-translate="quick_tip_title">Quick Tip</h2>
                         <p class="text-gray-700">•Best Practices for Harvesting Kharif Paddy (Rice)</p>
                         <p class="text-gray-700">•Prepare Your Fields for Rabi Season (Wheat & Mustard)</p>
                         <p class="text-gray-700">•Critical Pest Alert: Managing Gundhi Bug in Mature Paddy</p>
@@ -170,20 +170,8 @@
                 <!--Agriculture News-->
                 <div class="container py-8">
                     <div class="card">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-6">Latest Agriculture News</h2>
-                        <div id="news-container" class="space-y-4">
-                            <!-- <div class="p-4 bg-gray-50 rounded-lg border">
-                                <h3 class="font-bold text-gray-800">New MSP rates announced for Rabi crops.</h3>
-                                <p class="text-sm text-gray-600">The government has increased the Minimum Support Price
-                                    for wheat and mustard to support farmers.</p>
-                            </div>
-                            <div class="p-4 bg-gray-50 rounded-lg border">
-                                <h3 class="font-bold text-gray-800">Digital Mandi initiative expands to 50 new
-                                    districts.</h3>
-                                <p class="text-sm text-gray-600">The e-NAM platform now connects more farmers directly
-                                    to the market, ensuring better price discovery.</p>
-                            </div> -->
-                        </div>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6" data-translate="news_title">Latest Agriculture News</h2>
+                        <div id="news-container" class="space-y-4"></div>
                     </div>
                 </div>
             </section>
@@ -406,14 +394,12 @@
             const translations = {
                 en: {
                     nav_home: "Home", nav_mandi: "Mandi Prices", nav_buyer: "Buyer Connect", nav_advisory: "Advisory", nav_schemes: "Schemes",
-                    weather_title: "Today's Weather in Sarangpur East, Bihar", weather_sunny: "Sunny", weather_humidity: "Humidity: 65%", weather_wind: "Wind: 10 km/h",
-                    quick_tip_title: "Quick Tip", quick_tip_text: "With sunny days ahead, ensure proper irrigation. Consider mulching to retain soil moisture.",
+                    quick_tip_title: "Quick Tip",
                     news_title: "Latest Agriculture News", welcome_user: "Welcome"
                 },
                 hi: {
                     nav_home: "होम", nav_mandi: "मंडी मूल्य", nav_buyer: "क्रेता कनेक्ट", nav_advisory: "सलाह", nav_schemes: "योजनाएं",
-                    weather_title: "सारंगपुर पूर्व, बिहार में आज का मौसम", weather_sunny: "धूप", weather_humidity: "नमी: 65%", weather_wind: "हवा: 10 किमी/घंटा",
-                    quick_tip_title: "त्वरित सुझाव", quick_tip_text: "आगे धूप वाले दिनों के साथ, उचित सिंचाई सुनिश्चित करें। मिट्टी की नमी बनाए रखने के लिए मल्चिंग पर विचार करें।",
+                    quick_tip_title: "त्वरित सुझाव",
                     news_title: "नवीनतम कृषि समाचार", welcome_user: "आपका स्वागत है"
                 }
             };
@@ -427,7 +413,7 @@
                     el.textContent = translations[lang][key] || el.textContent;
                 });
                 // Also update dynamic welcome message
-                updateUIForAuthState();
+                //updateUIForAuthState();
             };
             languageSwitcher.addEventListener('change', (e) => setLanguage(e.target.value));
 
@@ -452,11 +438,11 @@
             const updateUIForAuthState = () => {
 
                 let navHTML = `
-                <button data-page="home" class="nav-btn hover:text-green-700">Home</button>
-                <button data-page="mandi" class="nav-btn hover:text-green-700">Mandi Prices</button>
-                <button data-page="buyer" class="nav-btn hover:text-green-700">Buyer Connect</button>
-                <button data-page="advisory" class="nav-btn hover:text-green-700">Advisory</button>
-                <button data-page="schemes" class="nav-btn hover:text-green-700">Schemes</button>`;
+                <button data-page="home" class="nav-btn hover:text-green-700" data-translate="nav_home">Home</button>
+                <button data-page="mandi" class="nav-btn hover:text-green-700" data-translate="nav_mandi">Mandi Prices</button>
+                <button data-page="buyer" class="nav-btn hover:text-green-700" data-translate="nav_buyer">Buyer Connect</button>
+                <button data-page="advisory" class="nav-btn hover:text-green-700" data-translate="nav_advisory">Advisory</button>
+                <button data-page="schemes" class="nav-btn hover:text-green-700" data-translate="nav_schemes">Schemes</button>`;
 
                 if (currentUser?.role === 'admin') {
                     navHTML += `<button data-page="admin" class="nav-btn bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">Admin Panel</button>`;
@@ -470,7 +456,7 @@
 
                 //const lang = languageSwitcher.value;
                 if (currentUser) {
-                    authLinksContainer.innerHTML = `<span class="font-medium text-gray-700">Welcome, ${currentUser.name} (${currentUser.role})</span><button id="logout-btn" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Logout</button>`;
+                    authLinksContainer.innerHTML = `<span class="font-medium text-gray-700" data-translate="welcome_user">Welcome, ${currentUser.name} (${currentUser.role})</span><button id="logout-btn" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Logout</button>`;
                     document.getElementById('logout-btn').addEventListener('click', handleLogout);
                 } else {
                     authLinksContainer.innerHTML = `<button id="login-btn" class="text-gray-600 hover:text-green-700 font-medium">Login</button><button id="register-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Register</button>`;
