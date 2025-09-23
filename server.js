@@ -13,7 +13,7 @@ const port = 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '')));
 app.use(session({
-    secret: 'a-very-secret-key-for-agrimandi-app',
+    secret: process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: { secure: false } // Set to true if using HTTPS
@@ -64,12 +64,16 @@ const getCollectionItems = async (collectionName, res) => {
         res.status(500).json({ message: `Error fetching from ${collectionName}` });
     }
 };
+
+
 const addCollectionItem = async (collectionName, req, res) => {
     try {
         await db.collection(collectionName).insertOne({ ...req.body, createdAt: new Date() });
         res.status(201).json({ message: 'Item added successfully' });
     } catch (err) { res.status(500).json({ message: `Error adding to ${collectionName}` }); }
 };
+
+
 const deleteCollectionItem = async (collectionName, req, res) => {
     try {
         const { id } = req.params;
@@ -78,6 +82,7 @@ const deleteCollectionItem = async (collectionName, req, res) => {
         res.json({ message: 'Item deleted successfully' });
     } catch (err) { res.status(500).json({ message: `Error deleting from ${collectionName}` }); }
 };
+
 
 // --- Public CMS Routes ---
 app.get('/api/news', (req, res) => getCollectionItems('news', res));
@@ -115,6 +120,8 @@ app.post('/api/auth/register', async (req, res) => {
         res.status(201).json({ message: "User registered successfully" });
     } catch (err) { res.status(500).json({ message: "Error registering user" }); }
 });
+
+
 app.post('/api/auth/login', async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ message: "Email and password are required" });
@@ -125,18 +132,24 @@ app.post('/api/auth/login', async (req, res) => {
         res.json({ message: "Logged in successfully", user: req.session.user });
     } catch (err) { res.status(500).json({ message: "Error logging in" }); }
 });
+
+
 app.post('/api/auth/logout', (req, res) => {
     req.session.destroy(err => {
         if (err) return res.status(500).json({ message: "Could not log out." });
         res.clearCookie('connect.sid').json({ message: "Logged out successfully" });
     });
 });
+
+
 app.get('/api/auth/status', (req, res) => res.json({ loggedIn: !!req.session.user, user: req.session.user || null }));
 
 // --- Mandi Price Routes ---
 app.get('/api/mandi', async (req, res) => {
     try { res.json(await db.collection('mandi_prices').find({}).toArray()); } catch (err) { res.status(500).json({ message: "Error fetching mandi prices" }); }
 });
+
+
 app.put('/api/mandi/update', isAuthenticated, isRole('admin'), async (req, res) => {
     const { state, crop, price } = req.body;
     if (!state || !crop || !price) return res.status(400).json({ message: "State, crop, and price are required." });
@@ -150,6 +163,8 @@ app.put('/api/mandi/update', isAuthenticated, isRole('admin'), async (req, res) 
 app.get('/api/buyers', async (req, res) => {
     try { res.json(await db.collection('buyers').find({}).sort({ createdAt: -1 }).toArray()); } catch (err) { res.status(500).json({ message: "Error fetching buyer requests" }); }
 });
+
+
 app.post('/api/buyers', isAuthenticated, isRole('buyer'), async (req, res) => {
     const { crop, quantity, contactNumber } = req.body;
     if (!crop || !quantity || !contactNumber) return res.status(400).json({ message: "All fields are required" });
@@ -158,6 +173,8 @@ app.post('/api/buyers', isAuthenticated, isRole('buyer'), async (req, res) => {
         res.status(201).json({ message: "Buyer request submitted successfully" });
     } catch (err) { res.status(500).json({ message: "Error submitting buyer request" }); }
 });
+
+
 app.delete('/api/buyers/:id', isAuthenticated, async (req, res) => {
     try {
         const request = await db.collection('buyers').findOne({ _id: new ObjectId(req.params.id) });
@@ -167,9 +184,13 @@ app.delete('/api/buyers/:id', isAuthenticated, async (req, res) => {
         res.json({ message: "Request deleted successfully." });
     } catch (err) { res.status(500).json({ message: "Error deleting request." }); }
 });
+
+
 app.get('/api/farmer-listings', async (req, res) => {
     try { res.json(await db.collection('farmer_listings').find({}).sort({ createdAt: -1 }).toArray()); } catch (err) { res.status(500).json({ message: "Error fetching farmer listings" }); }
 });
+
+
 app.post('/api/farmer-listings', isAuthenticated, isRole('farmer'), async (req, res) => {
     const { crop, quantity, price, contactNumber } = req.body;
     if (!crop || !quantity || !price || !contactNumber) return res.status(400).json({ message: "All fields are required." });
@@ -178,6 +199,8 @@ app.post('/api/farmer-listings', isAuthenticated, isRole('farmer'), async (req, 
         res.status(201).json({ message: "Listing posted successfully" });
     } catch (err) { res.status(500).json({ message: "Error posting listing" }); }
 });
+
+
 app.delete('/api/farmer-listings/:id', isAuthenticated, async (req, res) => {
     try {
         const listing = await db.collection('farmer_listings').findOne({ _id: new ObjectId(req.params.id) });
@@ -187,6 +210,8 @@ app.delete('/api/farmer-listings/:id', isAuthenticated, async (req, res) => {
         res.json({ message: "Listing deleted successfully." });
     } catch (err) { res.status(500).json({ message: "Error deleting listing." }); }
 });
+
+
 app.get('/api/my-posts', isAuthenticated, async (req, res) => {
     try {
         const userId = new ObjectId(req.session.user.id);
@@ -197,6 +222,8 @@ app.get('/api/my-posts', isAuthenticated, async (req, res) => {
         }
     } catch (err) { res.status(500).json({ message: "Error fetching your posts" }); }
 });
+
+
 app.put('/api/posts/:collection/:id/complete', isAuthenticated, async (req, res) => {
     const { collection, id } = req.params;
     const validCollections = ['buyers', 'farmer-listings'];
@@ -215,4 +242,5 @@ app.put('/api/posts/:collection/:id/complete', isAuthenticated, async (req, res)
 
 // --- Serve HTML and Start Server ---
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+
 app.listen(port, () => console.log(`Server listening at http://localhost:${port}`));

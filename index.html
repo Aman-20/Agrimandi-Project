@@ -122,7 +122,7 @@
                 <div id="main-nav-links" class="flex items-center space-x-4 text-gray-600 font-medium">
                 </div>
 
-                <div class="flex items-center space-x-4">
+                <div id="auth-container" class="flex items-center space-x-4">
                     <div id="auth-links"></div>
                     <select id="language-switcher" class="form-input w-auto text-sm py-1 px-2">
                         <option value="en">English</option>
@@ -207,6 +207,7 @@
                 <div class="card">
                     <h2 class="text-2xl font-bold text-gray-800 mb-6" data-translate="mandi_title">Daily Mandi Prices
                     </h2>
+                    <p id="mandi-date" class="text-sm text-gray-500 -mt-4 mb-6"></p>
                     <div class="flex flex-col md:flex-row gap-4 mb-6">
                         <div class="flex-1">
                             <label for="mandi-state" class="block text-gray-700 font-medium mb-1"
@@ -507,7 +508,6 @@
 
 
             //--- show notification ---
-            // ADD THIS NEW FUNCTION anywhere in your main script
             const showNotification = (message, type = 'success') => {
                 const container = document.getElementById('notification-container');
                 const toast = document.createElement('div');
@@ -528,7 +528,7 @@
             };
 
 
-            // ADD THIS NEW FUNCTION to your script
+            //--- show conform notification ---
             const showConfirmationModal = (message, onConfirm) => {
                 const modal = document.getElementById('confirm-modal');
                 document.getElementById('confirm-message').textContent = message;
@@ -583,18 +583,23 @@
             document.getElementById('show-register-link').addEventListener('click', (e) => { e.preventDefault(); closeModal('login-modal'); openModal('register-modal'); });
             document.getElementById('show-login-link').addEventListener('click', (e) => { e.preventDefault(); closeModal('register-modal'); openModal('login-modal'); });
 
-            // REPLACE your old updateUIForAuthState function with this one
+            // --- updateUIForAuthState function ---
             const updateUIForAuthState = () => {
+                const authContainer = document.getElementById('auth-container');
+
                 // --- 1. Build the entire navigation string first, based on login status ---
                 let navHTML = `
-        <button data-page="home" class="nav-btn hover:text-green-700" data-translate="nav_home">Home</button>
-        <button data-page="mandi" class="nav-btn hover:text-green-700" data-translate="nav_mandi">Mandi Prices</button>
-        <button data-page="buyer" class="nav-btn hover:text-green-700" data-translate="nav_buyer">Buyer Connect</button>
-        <button data-page="advisory" class="nav-btn hover:text-green-700" data-translate="nav_advisory">Advisory</button>
-        <button data-page="schemes" class="nav-btn hover:text-green-700" data-translate="nav_schemes">Schemes</button>`;
+                <button data-page="home" class="nav-btn hover:text-green-700" data-translate="nav_home">Home</button>
+                <button data-page="mandi" class="nav-btn hover:text-green-700" data-translate="nav_mandi">Mandi Prices</button>
+                <button data-page="buyer" class="nav-btn hover:text-green-700" data-translate="nav_buyer">Buyer Connect</button>
+                <button data-page="advisory" class="nav-btn hover:text-green-700" data-translate="nav_advisory">Advisory</button>
+                <button data-page="schemes" class="nav-btn hover:text-green-700" data-translate="nav_schemes">Schemes</button>`;
 
                 if (currentUser) {
-                    navHTML += `<button data-page="my-posts" class="nav-btn hover:text-green-700">My Posts</button>`;
+                    // Hide "My Posts" for admins
+                    if (currentUser.role !== 'admin') {
+                        navHTML += `<button data-page="my-posts" class="nav-btn hover:text-green-700">My Posts</button>`;
+                    }
                     if (currentUser.role === 'admin') {
                         navHTML += `<button data-page="admin" class="nav-btn bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">Admin Panel</button>`;
                     }
@@ -605,16 +610,20 @@
 
                 // --- 3. Update the auth links (Login/Register or Welcome/Logout) ---
                 if (currentUser) {
+                    // Move to a new line by adding classes
+                    authContainer.classList.add('w-full', 'justify-between', 'mt-2');
                     authLinksContainer.innerHTML = `
-            <span class="font-medium text-gray-700">
-                <span data-translate="welcome_user">Welcome</span>, ${currentUser.name} (${currentUser.role})
-            </span>
-            <button id="logout-btn" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Logout</button>`;
+                    <span class="font-medium text-gray-700">
+                        <span data-translate="welcome_user">Welcome</span>, ${currentUser.name} (${currentUser.role})
+                    </span>
+                    <button id="logout-btn" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Logout</button>`;
                     document.getElementById('logout-btn').addEventListener('click', handleLogout);
                 } else {
+                    // Keep on the same line by removing classes
+                    authContainer.classList.remove('w-full', 'justify-end', 'mt-2');
                     authLinksContainer.innerHTML = `
-            <button id="login-btn" class="text-gray-600 hover:text-green-700 font-medium">Login</button>
-            <button id="register-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Register</button>`;
+                    <button id="login-btn" class="text-gray-600 hover:text-green-700 font-medium">Login</button>
+                    <button id="register-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Register</button>`;
                     document.getElementById('login-btn').addEventListener('click', () => openModal('login-modal'));
                     document.getElementById('register-btn').addEventListener('click', () => openModal('register-modal'));
                 }
@@ -633,12 +642,12 @@
                 // --- 5. Re-apply the current language to all new elements ---
                 setLanguage(languageSwitcher.value);
 
-                // --- 6. CRUCIAL FIX: Re-fetch content that depends on login state ---
+                // --- 6. Re-fetch content that depends on login state ---
                 fetchBuyerRequests();
                 fetchFarmerListings();
             };
 
-            // REPLACE your old updateUIForAuthState function with this one
+            //--- updateUIForAuthState function ---
             const checkAuthStatus = async () => {
                 try {
                     const response = await fetch('/api/auth/status');
@@ -651,12 +660,11 @@
                 updateUIForAuthState();
             };
 
-            // ADD THIS HELPER FUNCTION to your script
+            // --- HELPER FUNCTION ---
             const formatDate = (dateString) => {
                 if (!dateString) return '';
                 return new Date(dateString).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
             };
-            // ... after checkAuthStatus function
 
             const getWeatherEmoji = (condition) => {
                 switch (condition) {
@@ -703,7 +711,7 @@
             };
 
 
-            // --- NEW: DYNAMIC CONTENT FETCHING ---
+            // --- DYNAMIC CONTENT FETCHING ---
             const fetchNews = async () => {
                 const response = await fetch('/api/news');
                 const newsItems = await response.json();
@@ -749,7 +757,6 @@
             };
 
             // --- NEW: ADMIN PANEL LOGIC ---
-            // --- ADD ALL OF THIS NEW JAVASCRIPT LOGIC ---
 
             // Function to fetch and render Farmer Listings
             const fetchFarmerListings = async () => {
@@ -875,8 +882,6 @@
             });
 
             // Event delegation for deleting a listing from "My Posts" page
-            // ADD THIS NEW, UNIFIED EVENT HANDLER
-            // REPLACE your old handlePostActions function with this one
             const handlePostActions = async (e) => {
                 const target = e.target;
                 if (!target.dataset.id || !target.dataset.collection) return;
@@ -968,8 +973,6 @@
                     loadAdminPanelData();
                 }
             });
-
-            // ADD THIS NEW EVENT LISTENER to your main script
 
             // Generic function to handle form submissions for adding items
             const handleAddFormSubmit = async (e, endpoint, body, callback) => {
@@ -1070,7 +1073,7 @@
                 if (response.ok) { showNotification('Registration successful! Please log in.'); closeModal('register-modal'); openModal('login-modal'); } else { const err = await response.json(); showNotification(`Registration failed: ${err.message}`, 'error'); }
             });
 
-            // REPLACE your old 'login-form' event listener with this one
+
             document.getElementById('login-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
 
@@ -1119,7 +1122,7 @@
                 showPage('home');           // Go back to the homepage
             };
 
-            // --- MANdi PRICE LOGIC (CORRECTED) ---
+            // --- MANdi PRICE LOGIC  ---
 
             const displayMandiData = () => {
                 const selectedState = document.getElementById('mandi-state').value;
@@ -1293,21 +1296,27 @@
             const initializeApp = async () => {
                 await checkAuthStatus();
 
-                // ADD THIS BLOCK to get location and fetch weather
+                // --- ADD THIS BLOCK TO DISPLAY THE CURRENT DATE ---
+                const today = new Date();
+                const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+                const formattedDate = today.toLocaleDateString('en-IN', dateOptions); // e.g., "24 September 2025"
+                document.getElementById('mandi-date').textContent = `Prices for: ${formattedDate}`;
+                // --- END OF NEW BLOCK ---
+
+
+                //  to get location and fetch weather
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
                             const { latitude, longitude } = position.coords;
                             fetchWeather(latitude, longitude);
                         },
-                        () => { // Error/denial case
+                        (error) => { // Error/denial case - ADDED 'error' HERE
                             console.error(`Geolocation error: ${error.message}`);
                             fetchWeather(25.5941, 85.1376); // Fallback to Patna, Bihar
-                            console.log("Geolocation denied. Falling back to default location.");
+                            console.log("Geolocation denied or failed. Falling back to default location.");
                         }
                     );
-                } else {
-                    fetchWeather(19.0760, 72.8777); // Fallback for older browsers
                 }
 
                 const stateDropdowns = [document.getElementById('mandi-state'), document.getElementById('update-state')];
