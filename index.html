@@ -83,10 +83,35 @@
         .carousel-item.active {
             display: block;
         }
+
+        .toast {
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.5s ease-in-out;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background-color: #28a745;
+        }
+
+        .toast.error {
+            background-color: #dc3545;
+        }
     </style>
 </head>
 
 <body class="bg-gray-100">
+    <div id="notification-container" class="fixed top-5 right-5 z-[1100] space-y-2"></div>
 
     <div id="app" class="flex flex-col min-h-screen">
         <!--nav bar-->
@@ -140,7 +165,7 @@
                             <h3 class="font-bold text-xl text-blue-800" data-translate="nav_buyer">Buyer Connect</h3>
                         </div>
                         <div data-page="advisory" class="nav-btn card clickable-tile cursor-pointer bg-yellow-50">
-                            <h3 class="font-bold text-xl text-yellow-800"  data-translate="nav_advisory">Advisory</h3>
+                            <h3 class="font-bold text-xl text-yellow-800" data-translate="nav_advisory">Advisory</h3>
                         </div>
                         <div data-page="schemes" class="nav-btn card clickable-tile cursor-pointer bg-red-50">
                             <h3 class="font-bold text-xl text-red-800" data-translate="nav_schemes">Schemes</h3>
@@ -160,7 +185,8 @@
                     </div>
 
                     <div class="card bg-lime-100">
-                        <h2 class="text-2xl font-bold text-lime-800 mb-2" data-translate="quick_tip_title">Quick Tip</h2>
+                        <h2 class="text-2xl font-bold text-lime-800 mb-2" data-translate="quick_tip_title">Quick Tip
+                        </h2>
                         <p class="text-gray-700">•Best Practices for Harvesting Kharif Paddy (Rice)</p>
                         <p class="text-gray-700">•Prepare Your Fields for Rabi Season (Wheat & Mustard)</p>
                         <p class="text-gray-700">•Critical Pest Alert: Managing Gundhi Bug in Mature Paddy</p>
@@ -170,7 +196,8 @@
                 <!--Agriculture News-->
                 <div class="container py-8">
                     <div class="card">
-                        <h2 class="text-2xl font-bold text-gray-800 mb-6" data-translate="news_title">Latest Agriculture News</h2>
+                        <h2 class="text-2xl font-bold text-gray-800 mb-6" data-translate="news_title">Latest Agriculture
+                            News</h2>
                         <div id="news-container" class="space-y-4"></div>
                     </div>
                 </div>
@@ -243,35 +270,84 @@
 
             <section id="page-buyer" class="page-content container py-8 hidden">
                 <div class="card">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Buyer & Farmer Connect</h2>
-                    <div id="buyer-form-section" class="hidden">
-                        <form id="buyer-form" class="space-y-4 mb-8 border-b pb-8">
-                            <div>
-                                <label for="buyer-crop-input" class="block text-gray-700 font-medium">Crop You
-                                    Need</label>
-                                <input type="text" id="buyer-crop-input" class="form-input" required>
-                            </div>
-                            <div>
-                                <label for="buyer-quantity-input" class="block text-gray-700 font-medium">Quantity (in
-                                    quintals)</label>
-                                <input type="number" id="buyer-quantity-input" class="form-input" required>
-                            </div>
-                            <div>
-                                <label for="buyer-contact-input" class="block text-gray-700 font-medium">Your Contact
-                                    Number</label>
-                                <input type="tel" id="buyer-contact-input" class="form-input"
-                                    placeholder="e.g., 9876543210" required>
-                            </div>
-                            <button type="submit"
-                                class="w-full bg-green-600 text-white font-semibold py-3 rounded-lg hover:bg-green-700">Submit
-                                Request</button>
-                        </form>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Buyer & Farmer Connect</h2>
+
+                    <div class="border-b border-gray-200 mb-6">
+                        <nav class="flex space-x-4" aria-label="Tabs">
+                            <button id="tab-buyer-requests"
+                                class="tab-btn px-3 py-2 font-medium text-lg rounded-t-lg border-b-2 border-green-600 text-green-600">Buyers
+                                Are Seeking</button>
+                            <button id="tab-farmer-listings"
+                                class="tab-btn px-3 py-2 font-medium text-lg text-gray-500 hover:text-gray-700">Farmers
+                                Are Selling</button>
+                        </nav>
                     </div>
-                    <div id="buyer-login-prompt" class="text-center p-4 bg-yellow-100 rounded-lg mb-6">
-                        <p>Please log in as a buyer to post a new request.</p>
+
+                    <div id="content-buyer-requests" class="tab-content">
+                        <div id="buyer-form-section" class="hidden">
+                            <form id="buyer-form" class="space-y-4 mb-8 border-b pb-8">
+                                <h3 class="text-xl font-semibold">Post a New Request</h3>
+                                <div>
+                                    <label for="buyer-crop-input" class="block text-gray-700 font-medium">Crop You
+                                        Need</label>
+                                    <input type="text" id="buyer-crop-input" class="form-input" required>
+                                </div>
+                                <div>
+                                    <label for="buyer-quantity-input" class="block text-gray-700 font-medium">Quantity
+                                        (in quintals)</label>
+                                    <input type="number" id="buyer-quantity-input" class="form-input" required>
+                                </div>
+                                <div>
+                                    <label for="buyer-contact-input" class="block text-gray-700 font-medium">Your
+                                        Contact Number</label>
+                                    <input type="tel" id="buyer-contact-input" class="form-input"
+                                        placeholder="e.g., 9876543210" required>
+                                </div>
+                                <button type="submit"
+                                    class="w-full bg-green-600 text-white font-semibold py-3 rounded-lg hover:bg-green-700">Submit
+                                    Request</button>
+                            </form>
+                        </div>
+                        <div id="buyer-login-prompt" class="text-center p-4 bg-yellow-100 rounded-lg mb-6">
+                            <p>Please log in as a buyer to post a new request.</p>
+                        </div>
+                        <div id="buyer-requests" class="space-y-4"></div>
                     </div>
-                    <h3 class="text-xl font-semibold mb-4">Recent Requests</h3>
-                    <div id="buyer-requests" class="space-y-4">
+
+                    <div id="content-farmer-listings" class="tab-content hidden">
+                        <div id="farmer-form-section" class="hidden">
+                            <form id="farmer-form" class="space-y-4 mb-8 border-b pb-8">
+                                <h3 class="text-xl font-semibold">Post Your Available Produce</h3>
+                                <div>
+                                    <label for="farmer-crop-input" class="block text-gray-700 font-medium">Crop You Are
+                                        Selling</label>
+                                    <input type="text" id="farmer-crop-input" class="form-input" required>
+                                </div>
+                                <div>
+                                    <label for="farmer-quantity-input" class="block text-gray-700 font-medium">Quantity
+                                        Available (in quintals)</label>
+                                    <input type="number" id="farmer-quantity-input" class="form-input" required>
+                                </div>
+                                <div>
+                                    <label for="farmer-price-input" class="block text-gray-700 font-medium">Price (per
+                                        quintal)</label>
+                                    <input type="number" id="farmer-price-input" class="form-input"
+                                        placeholder="e.g., 2200" required>
+                                </div>
+                                <div>
+                                    <label for="farmer-contact-input" class="block text-gray-700 font-medium">Your
+                                        Contact Number</label>
+                                    <input type="tel" id="farmer-contact-input" class="form-input" required>
+                                </div>
+                                <button type="submit"
+                                    class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700">Submit
+                                    Listing</button>
+                            </form>
+                        </div>
+                        <div id="farmer-login-prompt" class="text-center p-4 bg-yellow-100 rounded-lg mb-6">
+                            <p>Please log in as a farmer to post your produce.</p>
+                        </div>
+                        <div id="farmer-listings" class="space-y-4"></div>
                     </div>
                 </div>
             </section>
@@ -319,6 +395,15 @@
                     <div id="admin-advisory-list" class="space-y-2"></div>
                 </div>
             </section>
+
+            <section id="page-my-posts" class="page-content container py-8 hidden">
+                <div class="card">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">My Posts</h2>
+                    <div id="my-posts-container" class="space-y-4">
+                    </div>
+                </div>
+            </section>
+
         </main>
 
         <footer class="bg-gray-800 text-white py-8 mt-auto">
@@ -340,12 +425,14 @@
                         <label for="login-password" class="block text-gray-700">Password</label>
                         <input type="password" id="login-password" class="form-input" required>
                     </div>
-                    <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg">Login</button>
+                    <button type="submit" id="login-submit-btn"
+                        class="w-full bg-green-600 text-white py-2 rounded-lg">Login</button>
                     <p class="text-center text-sm mt-4">Don't have an account? <a href="#" id="show-register-link"
                             class="text-blue-600">Register here</a></p>
                 </form>
             </div>
         </div>
+
         <div id="register-modal" class="modal">
             <div class="modal-content">
                 <span class="close-btn" data-modal="register-modal">&times;</span>
@@ -377,6 +464,20 @@
                 </form>
             </div>
         </div>
+
+        <div id="confirm-modal" class="modal">
+            <div class="modal-content">
+                <h2 class="text-2xl font-bold mb-4">Confirmation</h2>
+                <p id="confirm-message" class="mb-6 text-gray-700"></p>
+                <div class="flex justify-end space-x-4">
+                    <button id="confirm-no-btn"
+                        class="px-6 py-2 rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300">Cancel</button>
+                    <button id="confirm-yes-btn"
+                        class="px-6 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700">Confirm</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
 
@@ -405,6 +506,52 @@
             };
 
 
+            //--- show notification ---
+            // ADD THIS NEW FUNCTION anywhere in your main script
+            const showNotification = (message, type = 'success') => {
+                const container = document.getElementById('notification-container');
+                const toast = document.createElement('div');
+                toast.className = `toast ${type}`;
+                toast.textContent = message;
+                container.appendChild(toast);
+
+                // Animate in
+                setTimeout(() => {
+                    toast.classList.add('show');
+                }, 100);
+
+                // Animate out and remove after 3 seconds
+                setTimeout(() => {
+                    toast.classList.remove('show');
+                    toast.addEventListener('transitionend', () => toast.remove());
+                }, 3000);
+            };
+
+
+            // ADD THIS NEW FUNCTION to your script
+            const showConfirmationModal = (message, onConfirm) => {
+                const modal = document.getElementById('confirm-modal');
+                document.getElementById('confirm-message').textContent = message;
+
+                const yesBtn = document.getElementById('confirm-yes-btn');
+                const noBtn = document.getElementById('confirm-no-btn');
+
+                // Clone the button to remove old event listeners - this is a crucial step
+                const newYesBtn = yesBtn.cloneNode(true);
+                yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+
+                const close = () => modal.style.display = 'none';
+
+                newYesBtn.onclick = () => {
+                    close();
+                    onConfirm(); // Execute the action
+                };
+
+                noBtn.onclick = close;
+
+                modal.style.display = 'block';
+            };
+
             // --- NEW: Language Switcher Logic ---
             const languageSwitcher = document.getElementById('language-switcher');
             const setLanguage = (lang) => {
@@ -428,6 +575,7 @@
             };
 
 
+
             const openModal = (modalId) => document.getElementById(modalId).style.display = 'block';
             const closeModal = (modalId) => document.getElementById(modalId).style.display = 'none';
 
@@ -435,50 +583,62 @@
             document.getElementById('show-register-link').addEventListener('click', (e) => { e.preventDefault(); closeModal('login-modal'); openModal('register-modal'); });
             document.getElementById('show-login-link').addEventListener('click', (e) => { e.preventDefault(); closeModal('register-modal'); openModal('login-modal'); });
 
+            // REPLACE your old updateUIForAuthState function with this one
             const updateUIForAuthState = () => {
-
+                // --- 1. Build the entire navigation string first, based on login status ---
                 let navHTML = `
-                <button data-page="home" class="nav-btn hover:text-green-700" data-translate="nav_home">Home</button>
-                <button data-page="mandi" class="nav-btn hover:text-green-700" data-translate="nav_mandi">Mandi Prices</button>
-                <button data-page="buyer" class="nav-btn hover:text-green-700" data-translate="nav_buyer">Buyer Connect</button>
-                <button data-page="advisory" class="nav-btn hover:text-green-700" data-translate="nav_advisory">Advisory</button>
-                <button data-page="schemes" class="nav-btn hover:text-green-700" data-translate="nav_schemes">Schemes</button>`;
+        <button data-page="home" class="nav-btn hover:text-green-700" data-translate="nav_home">Home</button>
+        <button data-page="mandi" class="nav-btn hover:text-green-700" data-translate="nav_mandi">Mandi Prices</button>
+        <button data-page="buyer" class="nav-btn hover:text-green-700" data-translate="nav_buyer">Buyer Connect</button>
+        <button data-page="advisory" class="nav-btn hover:text-green-700" data-translate="nav_advisory">Advisory</button>
+        <button data-page="schemes" class="nav-btn hover:text-green-700" data-translate="nav_schemes">Schemes</button>`;
 
-                if (currentUser?.role === 'admin') {
-                    navHTML += `<button data-page="admin" class="nav-btn bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">Admin Panel</button>`;
+                if (currentUser) {
+                    navHTML += `<button data-page="my-posts" class="nav-btn hover:text-green-700">My Posts</button>`;
+                    if (currentUser.role === 'admin') {
+                        navHTML += `<button data-page="admin" class="nav-btn bg-red-100 text-red-700 px-2 py-1 rounded hover:bg-red-200">Admin Panel</button>`;
+                    }
                 }
+
+                // --- 2. Render the complete navigation bar to the DOM once ---
                 mainNavLinks.innerHTML = navHTML;
 
-                // Re-add event listeners to the new nav buttons
+                // --- 3. Update the auth links (Login/Register or Welcome/Logout) ---
+                if (currentUser) {
+                    authLinksContainer.innerHTML = `
+            <span class="font-medium text-gray-700">
+                <span data-translate="welcome_user">Welcome</span>, ${currentUser.name} (${currentUser.role})
+            </span>
+            <button id="logout-btn" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Logout</button>`;
+                    document.getElementById('logout-btn').addEventListener('click', handleLogout);
+                } else {
+                    authLinksContainer.innerHTML = `
+            <button id="login-btn" class="text-gray-600 hover:text-green-700 font-medium">Login</button>
+            <button id="register-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Register</button>`;
+                    document.getElementById('login-btn').addEventListener('click', () => openModal('login-modal'));
+                    document.getElementById('register-btn').addEventListener('click', () => openModal('register-modal'));
+                }
+
+                // --- 4. Re-apply event listeners and update visibility of other page sections ---
                 document.querySelectorAll('.nav-btn').forEach(button => {
                     button.addEventListener('click', () => showPage(button.dataset.page));
                 });
 
-                //const lang = languageSwitcher.value;
-                if (currentUser) {
-                    authLinksContainer.innerHTML = `<span class="font-medium text-gray-700" data-translate="welcome_user">Welcome, ${currentUser.name} (${currentUser.role})</span><button id="logout-btn" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 text-sm">Logout</button>`;
-                    document.getElementById('logout-btn').addEventListener('click', handleLogout);
-                } else {
-                    authLinksContainer.innerHTML = `<button id="login-btn" class="text-gray-600 hover:text-green-700 font-medium">Login</button><button id="register-btn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">Register</button>`;
-                    document.getElementById('login-btn').addEventListener('click', () => openModal('login-modal'));
-                    document.getElementById('register-btn').addEventListener('click', () => openModal('register-modal'));
-                }
-                // Other UI updates remain the same...
-                // Part 3: Update page sections based on role
-                const buyerFormSection = document.getElementById('buyer-form-section');
-                if (buyerFormSection) buyerFormSection.style.display = currentUser?.role === 'buyer' ? 'block' : 'none';
+                document.getElementById('buyer-form-section').style.display = currentUser?.role === 'buyer' ? 'block' : 'none';
+                document.getElementById('buyer-login-prompt').style.display = currentUser ? 'none' : 'block';
+                document.getElementById('farmer-form-section').style.display = currentUser?.role === 'farmer' ? 'block' : 'none';
+                document.getElementById('farmer-login-prompt').style.display = currentUser ? 'none' : 'block';
+                document.getElementById('admin-price-update-section').style.display = currentUser?.role === 'admin' ? 'block' : 'none';
 
-                const buyerLoginPrompt = document.getElementById('buyer-login-prompt');
-                if (buyerLoginPrompt) buyerLoginPrompt.style.display = currentUser?.role === 'buyer' ? 'none' : 'block';
+                // --- 5. Re-apply the current language to all new elements ---
+                setLanguage(languageSwitcher.value);
 
-                const adminPriceUpdateSection = document.getElementById('admin-price-update-section');
-                if (adminPriceUpdateSection) adminPriceUpdateSection.style.display = currentUser?.role === 'admin' ? 'block' : 'none';
-
-                //fetchBuyerRequests();
+                // --- 6. CRUCIAL FIX: Re-fetch content that depends on login state ---
+                fetchBuyerRequests();
+                fetchFarmerListings();
             };
 
-
-            //authentication logic
+            // REPLACE your old updateUIForAuthState function with this one
             const checkAuthStatus = async () => {
                 try {
                     const response = await fetch('/api/auth/status');
@@ -491,6 +651,11 @@
                 updateUIForAuthState();
             };
 
+            // ADD THIS HELPER FUNCTION to your script
+            const formatDate = (dateString) => {
+                if (!dateString) return '';
+                return new Date(dateString).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+            };
             // ... after checkAuthStatus function
 
             const getWeatherEmoji = (condition) => {
@@ -584,6 +749,194 @@
             };
 
             // --- NEW: ADMIN PANEL LOGIC ---
+            // --- ADD ALL OF THIS NEW JAVASCRIPT LOGIC ---
+
+            // Function to fetch and render Farmer Listings
+            const fetchFarmerListings = async () => {
+                try {
+                    const response = await fetch('/api/farmer-listings');
+                    const listings = await response.json();
+                    const container = document.getElementById('farmer-listings');
+                    container.innerHTML = listings.length === 0 ? `<p class="text-gray-500">No produce listed for sale currently.</p>` : '';
+
+                    // REPLACE the forEach loop in fetchFarmerListings
+                    listings.forEach(listing => {
+                        const isOwner = currentUser && currentUser.id === listing.farmerId.toString();
+                        const isCompleted = listing.status === 'completed';
+
+                        container.innerHTML += `
+        <div class="card bg-gray-50 border ${isCompleted ? 'border-gray-300' : 'border-green-400'}">
+             <div class="flex justify-between items-start">
+                <div>
+                    <h4 class="font-bold text-lg">${listing.crop} - ${listing.quantity} quintals</h4>
+                    <p class="font-semibold text-green-700">Price: ₹${listing.price} / quintal</p>
+                    <p class="text-sm text-gray-600">Posted by: ${listing.farmerName}</p>
+                    ${!isCompleted ? `<p class="text-sm text-gray-600 font-medium">Contact: ${listing.contactNumber}</p>` : ''}
+                </div>
+                <span class="font-semibold px-3 py-1 text-sm rounded-full capitalize ${isCompleted ? 'bg-gray-200 text-gray-800' : 'bg-green-100 text-green-800'}">${isCompleted ? 'completed' : 'available'}</span>
+            </div>
+
+            ${isOwner ? `
+            <div class="mt-4 pt-4 border-t">
+                 ${isCompleted ? `
+                <div class="text-xs text-gray-500">
+                    <span>Posted: ${formatDate(listing.createdAt)}</span> | 
+                    <span>Completed: ${formatDate(listing.completedAt)}</span>
+                </div>
+                ` : `
+                <div class="flex gap-2">
+                    <button data-id="${listing._id}" data-collection="farmer-listings" class="complete-btn flex-1 bg-green-500 text-white py-1 rounded hover:bg-green-600 text-sm">Mark as Complete</button>
+                    <button data-id="${listing._id}" data-collection="farmer-listings" class="delete-btn flex-1 bg-red-500 text-white py-1 rounded hover:bg-red-600 text-sm">Delete</button>
+                </div>
+                `}
+            </div>
+            ` : ''}
+        </div>
+    `;
+                    });
+
+
+                } catch (error) {
+                    console.error("Failed to fetch farmer listings:", error);
+                }
+            };
+
+            // Function to fetch and render the user's own posts
+            const fetchMyPosts = async () => {
+                if (!currentUser) return;
+                try {
+                    const response = await fetch('/api/my-posts');
+                    const posts = await response.json();
+                    const container = document.getElementById('my-posts-container');
+                    container.innerHTML = posts.length === 0 ? `<p class="text-gray-500">You have not posted anything yet.</p>` : '';
+
+                    // REPLACE the entire posts.forEach loop inside fetchMyPosts
+                    // REPLACE the forEach loop in fetchMyPosts
+                    posts.forEach(post => {
+                        const isCompleted = post.status === 'completed';
+                        const isBuyerPost = !!post.buyerName;
+                        const collection = isBuyerPost ? 'buyers' : 'farmer-listings';
+                        let postHTML = '';
+
+                        const completedView = `
+        <div class="mt-2 pt-2 border-t text-xs text-gray-500">
+            <span>Posted: ${formatDate(post.createdAt)}</span> | 
+            <span>Completed: ${formatDate(post.completedAt)}</span>
+        </div>`;
+
+                        const openView = `
+        <div class="mt-2 pt-2 border-t flex gap-2">
+            <button data-id="${post._id}" data-collection="${collection}" class="complete-btn flex-1 bg-green-500 text-white py-1 rounded hover:bg-green-600 text-sm">Mark as Complete</button>
+            <button data-id="${post._id}" data-collection="${collection}" class="delete-btn flex-1 bg-red-500 text-white py-1 rounded hover:bg-red-600 text-sm">Delete</button>
+        </div>`;
+
+                        if (isBuyerPost) {
+                            postHTML = `
+        <div class="p-4 border rounded-lg">
+            <p class="text-sm text-gray-500">Your Buyer Request</p>
+            <h4 class="font-bold text-lg">${post.crop} - ${post.quantity} quintals</h4>
+            <span class="font-semibold px-2 py-0.5 text-xs rounded-full capitalize ${isCompleted ? 'bg-gray-200 text-gray-800' : 'bg-blue-100 text-blue-800'}">${post.status}</span>
+            ${isCompleted ? completedView : openView}
+        </div>`;
+                        } else {
+                            postHTML = `
+        <div class="p-4 border rounded-lg">
+            <p class="text-sm text-gray-500">Your Farmer Listing</p>
+            <h4 class="font-bold text-lg">${post.crop} - ${post.quantity} quintals at ₹${post.price}/q</h4>
+            <span class="font-semibold px-2 py-0.5 text-xs rounded-full capitalize ${isCompleted ? 'bg-gray-200 text-gray-800' : 'bg-green-100 text-green-800'}">${isCompleted ? 'completed' : 'available'}</span>
+            ${isCompleted ? completedView : openView}
+        </div>`;
+                        }
+                        container.innerHTML += postHTML;
+                    });
+
+                } catch (error) {
+                    console.error("Failed to fetch my posts:", error);
+                }
+            };
+
+            // Event listener for the new Farmer form
+            document.getElementById('farmer-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const body = {
+                    crop: e.target.elements['farmer-crop-input'].value,
+                    quantity: e.target.elements['farmer-quantity-input'].value,
+                    price: e.target.elements['farmer-price-input'].value,
+                    contactNumber: e.target.elements['farmer-contact-input'].value
+                };
+                const response = await fetch('/api/farmer-listings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                if (response.ok) {
+                    showNotification('Listing submitted successfully!');
+                    e.target.reset();
+                    fetchFarmerListings();
+                } else {
+                    showNotification('Failed to submit listing.');
+                }
+            });
+
+            // Event delegation for deleting a listing from "My Posts" page
+            // ADD THIS NEW, UNIFIED EVENT HANDLER
+            // REPLACE your old handlePostActions function with this one
+            const handlePostActions = async (e) => {
+                const target = e.target;
+                if (!target.dataset.id || !target.dataset.collection) return;
+
+                const id = target.dataset.id;
+                const collection = target.dataset.collection;
+
+                // Handle "Mark as Complete"
+                if (target.classList.contains('complete-btn')) {
+                    showConfirmationModal('Are you sure you want to mark this post as completed?', async () => {
+                        const response = await fetch(`/api/posts/${collection}/${id}/complete`, { method: 'PUT' });
+                        if (response.ok) {
+                            showNotification('Post marked as complete!');
+                            fetchBuyerRequests(); fetchFarmerListings(); if (!document.getElementById('page-my-posts').classList.contains('hidden')) fetchMyPosts();
+                        } else {
+                            showNotification('Failed to update post.', 'error');
+                        }
+                    });
+                }
+
+                // Handle "Delete"
+                if (target.classList.contains('delete-btn')) {
+                    showConfirmationModal('Are you sure you want to permanently delete this post?', async () => {
+                        const response = await fetch(`/api/${collection}/${id}`, { method: 'DELETE' });
+                        if (response.ok) {
+                            showNotification('Post deleted successfully!');
+                            fetchBuyerRequests(); fetchFarmerListings(); if (!document.getElementById('page-my-posts').classList.contains('hidden')) fetchMyPosts();
+                        } else {
+                            showNotification('Failed to delete post.', 'error');
+                        }
+                    });
+                }
+            };
+
+            document.getElementById('page-buyer').addEventListener('click', handlePostActions);
+            document.getElementById('page-my-posts').addEventListener('click', handlePostActions);
+
+
+            // Event listener for showing the "My Posts" page and fetching data
+            document.addEventListener('click', e => {
+                if (e.target && e.target.dataset.page === 'my-posts') {
+                    fetchMyPosts();
+                }
+            });
+
+            // Logic for the new tabs on the Buyer Connect page
+            const tabs = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Style tabs
+                    tabs.forEach(t => t.classList.remove('border-green-600', 'text-green-600'));
+                    tab.classList.add('border-green-600', 'text-green-600');
+
+                    // Show content
+                    tabContents.forEach(c => c.classList.add('hidden'));
+                    const contentId = `content-${tab.id.split('-')[1]}-${tab.id.split('-')[2]}`;
+                    document.getElementById(contentId).classList.remove('hidden');
+                });
+            });
 
             // Generic function to render items in the admin panel
             const renderAdminList = async (endpoint, containerId, fields) => {
@@ -616,6 +969,8 @@
                 }
             });
 
+            // ADD THIS NEW EVENT LISTENER to your main script
+
             // Generic function to handle form submissions for adding items
             const handleAddFormSubmit = async (e, endpoint, body, callback) => {
                 e.preventDefault();
@@ -628,7 +983,7 @@
                     e.target.reset();
                     callback(); // Reload the list
                 } else {
-                    alert('Failed to add item.');
+                    showNotification('Action failed.', 'error')
                 }
             };
 
@@ -665,7 +1020,7 @@
                         if (response.ok) {
                             loadAdminPanelData(); // Refresh all lists
                         } else {
-                            alert('Failed to delete item.');
+                            showNotification('Action failed.', 'error')
                         }
                     }
                 }
@@ -712,17 +1067,57 @@
                 e.preventDefault();
                 const body = { name: e.target.elements['register-name'].value, email: e.target.elements['register-email'].value, password: e.target.elements['register-password'].value, role: e.target.elements['register-role'].value };
                 const response = await fetch('/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-                if (response.ok) { alert('Registration successful! Please log in.'); closeModal('register-modal'); openModal('login-modal'); } else { const err = await response.json(); alert(`Registration failed: ${err.message}`); }
+                if (response.ok) { showNotification('Registration successful! Please log in.'); closeModal('register-modal'); openModal('login-modal'); } else { const err = await response.json(); showNotification(`Registration failed: ${err.message}`, 'error'); }
             });
 
+            // REPLACE your old 'login-form' event listener with this one
             document.getElementById('login-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const body = { email: e.target.elements['login-email'].value, password: e.target.elements['login-password'].value };
-                const response = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-                if (response.ok) { const data = await response.json(); currentUser = data.user; closeModal('login-modal'); updateUIForAuthState(); } else { alert('Login failed. Please check your credentials.'); }
+
+                // Get the button and store its original text
+                const loginBtn = document.getElementById('login-submit-btn');
+                const originalBtnText = loginBtn.textContent;
+
+                // --- Start loading state ---
+                loginBtn.textContent = 'Logging in...';
+                loginBtn.disabled = true;
+
+                try {
+                    const body = {
+                        email: e.target.elements['login-email'].value,
+                        password: e.target.elements['login-password'].value
+                    };
+
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(body)
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        currentUser = data.user;
+                        closeModal('login-modal');
+                        updateUIForAuthState();
+                    } else {
+                        showNotification('Login failed. Please check your credentials.', 'error');
+                    }
+                } catch (error) {
+                    console.error('Login error:', error);
+                    showNotification('An unexpected error occurred.', 'error');
+                } finally {
+                    // --- End loading state (this runs on success or failure) ---
+                    loginBtn.textContent = originalBtnText;
+                    loginBtn.disabled = false;
+                }
             });
 
-            const handleLogout = async () => { await fetch('/api/auth/logout', { method: 'POST' }); currentUser = null; updateUIForAuthState(); };
+            const handleLogout = async () => {
+                await fetch('/api/auth/logout', { method: 'POST' });
+                currentUser = null;         // Set user to null first
+                updateUIForAuthState();     // THEN, update the screen
+                showPage('home');           // Go back to the homepage
+            };
 
             // --- MANdi PRICE LOGIC (CORRECTED) ---
 
@@ -816,7 +1211,7 @@
                 };
 
                 if (!body.state || !body.crop || !body.price) {
-                    alert('Please fill out all fields.');
+                    showNotification('Please fill out all fields.');
                     return;
                 }
 
@@ -828,17 +1223,17 @@
                     });
 
                     if (response.ok) {
-                        alert('Price updated successfully!');
+                        showNotification('Price updated successfully!');
                         updatePriceForm.reset(); // Clear the form
                         adminCropSelect.innerHTML = '<option value="">-- Select a state first --</option>'; // Reset crop dropdown
                         fetchMandiData(); // Refresh the data in the table
                     } else {
                         const error = await response.json();
-                        alert(`Update failed: ${error.message}`);
+                        showNotification(`Update failed: ${error.message}`);
                     }
                 } catch (error) {
                     console.error('Error updating price:', error);
-                    alert('An error occurred. Please try again.');
+                    showNotification('An error occurred. Please try again.');
                 }
             });
 
@@ -850,30 +1245,41 @@
                     const requests = await response.json();
                     const buyerRequestsDiv = document.getElementById('buyer-requests');
                     buyerRequestsDiv.innerHTML = requests.length === 0 ? `<p class="text-gray-500">No active requests found.</p>` : '';
+
+                    // REPLACE the forEach loop in fetchBuyerRequests
                     requests.forEach(req => {
+                        const isOwner = currentUser && currentUser.id === req.buyerId.toString();
                         const isCompleted = req.status === 'completed';
+
                         buyerRequestsDiv.innerHTML += `
-                        <div class="card bg-gray-50 border ${isCompleted ? 'border-green-400' : 'border-gray-200'}">
-                            <div class="flex justify-between items-start">
-                                <div>
-                                    <h4 class="font-bold text-lg">${req.crop} - ${req.quantity} quintals</h4>
-                                    <p class="text-sm text-gray-600">Posted by: ${req.buyerName}</p>
-                                    <p class="text-sm text-gray-600">Contact: ${req.contactNumber}</p>
-                                </div>
-                                <span class="font-semibold px-3 py-1 text-sm rounded-full capitalize ${isCompleted ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">${req.status}</span>
-                            </div>
-                            ${isCompleted ? `<div class="mt-4 pt-4 border-t border-green-300"><p class="font-semibold text-green-700">Accepted by Farmer: ${req.acceptedByFarmerName}</p><p class="text-sm text-gray-600">Farmer Contact: ${req.acceptedByFarmerContact}</p></div>` : ''}
-                            ${(currentUser?.role === 'farmer' && !isCompleted) ? `<button data-request-id="${req._id}" class="accept-request-btn mt-4 bg-blue-500 text-white w-full py-2 rounded hover:bg-blue-600">Accept This Request</button>` : ''}
-                        </div>`;
+    <div class="card bg-gray-50 border ${isCompleted ? 'border-gray-300' : 'border-blue-400'}">
+        <div class="flex justify-between items-start">
+            <div>
+                <h4 class="font-bold text-lg">${req.crop} - ${req.quantity} quintals</h4>
+                <p class="text-sm text-gray-600">Posted by: ${req.buyerName}</p>
+                ${!isCompleted ? `<p class="text-sm text-gray-600 font-medium">Contact: ${req.contactNumber}</p>` : ''}
+            </div>
+            <span class="font-semibold px-3 py-1 text-sm rounded-full capitalize ${isCompleted ? 'bg-gray-200 text-gray-800' : 'bg-blue-100 text-blue-800'}">${req.status}</span>
+        </div>
+        
+        ${isOwner ? `
+        <div class="mt-4 pt-4 border-t">
+            ${isCompleted ? `
+            <div class="text-xs text-gray-500">
+                <span>Posted: ${formatDate(req.createdAt)}</span> | 
+                <span>Completed: ${formatDate(req.completedAt)}</span>
+            </div>
+            ` : `
+            <div class="flex gap-2">
+                <button data-id="${req._id}" data-collection="buyers" class="complete-btn flex-1 bg-green-500 text-white py-1 rounded hover:bg-green-600 text-sm">Mark as Complete</button>
+                <button data-id="${req._id}" data-collection="buyers" class="delete-btn flex-1 bg-red-500 text-white py-1 rounded hover:bg-red-600 text-sm">Delete</button>
+            </div>
+            `}
+        </div>
+        ` : ''}
+    </div>`;
                     });
-                    document.querySelectorAll('.accept-request-btn').forEach(btn => {
-                        btn.addEventListener('click', async () => {
-                            const farmerContact = prompt("Please enter your contact number to share with the buyer:");
-                            if (!farmerContact) { alert("Contact number is required."); return; }
-                            const res = await fetch(`/api/requests/${btn.dataset.requestId}/accept`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ farmerContact }) });
-                            if (res.ok) { alert('Request accepted!'); fetchBuyerRequests(); } else { alert('Failed to accept request.'); }
-                        });
-                    });
+
                 } catch (error) { console.error("Failed to fetch buyer requests:", error); }
             };
 
@@ -881,7 +1287,7 @@
                 e.preventDefault();
                 const body = { crop: e.target.elements['buyer-crop-input'].value, quantity: e.target.elements['buyer-quantity-input'].value, contactNumber: e.target.elements['buyer-contact-input'].value };
                 const response = await fetch('/api/buyers', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-                if (response.ok) { alert('Request submitted!'); e.target.reset(); fetchBuyerRequests(); } else { alert('Failed to submit request.'); }
+                if (response.ok) { showNotification('Request submitted successfully!'); e.target.reset(); fetchBuyerRequests(); } else { showNotification('Failed to submit request.'); }
             });
 
             const initializeApp = async () => {
@@ -919,6 +1325,7 @@
                 fetchAdvisory();
                 fetchMandiData();
                 fetchBuyerRequests();
+                fetchFarmerListings();
 
 
                 // MODIFIED: The event listeners now call the correct functions
