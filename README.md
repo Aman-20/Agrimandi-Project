@@ -31,20 +31,21 @@ It helps streamline crop listing, buyer requests, and mandi administration, maki
    ```bash
    git clone https://github.com/Aman-20/Agrimandi-Project.git
    cd Agrimandi-Project
+   ```
 
 2. Install dependencies:
-   npm install
+   - npm install
 
 3. Create a .env file and add:
-   MONGO_URI=your_mongodb_connection_string
-   JWT_SECRET=your_secret_key
-   PORT=5000
+   - MONGO_URI=your_mongodb_connection_string
+   - JWT_SECRET=your_secret_key
+   - PORT=5000
 
 4. Start the server:
-   node server.js
+   - node server.js
 
 5. Visit the app
-   http://localhost:5000
+   - http://localhost:5000
 
 
 ## 📸 Screenshots
@@ -68,24 +69,27 @@ It helps streamline crop listing, buyer requests, and mandi administration, maki
 ![Admin Panel](./screenshots/adminPanel.png)
 
 
+## 📂 Project Structure
 
+```bash
 Agrimandi-Project/
-│-- screenshots/          
-│-- .env/          # environment variables
-│-- index.html/            # html,css,js
-│-- package-lock.json/           
-│-- package.json      
-│-- README.md          # Project documentation
-│-- server.js          # Express backend code
+├── screenshots/        # Screenshots for README
+├── .env                # Environment variables
+├── index.html          # Frontend (HTML, CSS, JS)
+├── package-lock.json
+├── package.json
+├── README.md           # Project documentation
+├── server.js           # Express backend code
+```
+
+## Contributions are welcome!
+-  Fork the repo
+-  Create a new branch (feature-xyz)
+-  Commit changes
+-  Open a pull request
 
 
-Contributions are welcome!
- • Fork the repo
- • Create a new branch (feature-xyz)
- • Commit changes
- • Open a pull request
-
-
-👨‍💻 Author
- • Aman
+## 👨‍💻 Author
+- Aman
+  
 
