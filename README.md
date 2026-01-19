@@ -38,6 +38,7 @@ It helps streamline crop listing, buyer requests, and mandi administration, maki
 
 3. Create a .env file and add:
    - MONGO_URI=your_mongodb_connection_string
+   - OPENWEATHER_API_KEY=
    - JWT_SECRET=your_secret_key
    - PORT=5000
 
